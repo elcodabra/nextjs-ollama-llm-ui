@@ -1,12 +1,17 @@
 import type { NextRequest } from 'next/server'
 import { chromium } from "playwright";
 import robotsParser from "robots-parser";
-import { writeFileSync } from "fs";
+import { writeFileSync, existsSync, readFileSync } from "fs";
 import path from "path";
 import axios from "axios";
 import { URL } from "url";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
 export const dynamic = 'force-dynamic'
+
+const splitter = new RecursiveCharacterTextSplitter({
+  chunkSize: 1000, chunkOverlap: 200
+});
 
 async function getAllowedUrls(domain: string) {
   try {
@@ -19,7 +24,20 @@ async function getAllowedUrls(domain: string) {
   }
 }
 
-async function crawlDomain(domain: string, visited = new Set()) {
+const appendToJSONFile = async (newData: any[] = [], filePath: string) => {
+  let existingData = [];
+
+  if (existsSync(filePath)) {
+    const content = readFileSync(filePath, 'utf8');
+    existingData = JSON.parse(content || '[]');
+  }
+
+  const combined = [...existingData, ...newData];
+  console.log('writing...', JSON.stringify(combined))
+  writeFileSync(filePath, JSON.stringify(combined, null, 2), 'utf8');
+};
+
+async function crawlDomain(domain: string, filePath: string, visited = new Set()) {
   if (visited.has(domain)) return [];
   visited.add(domain);
 
@@ -27,8 +45,36 @@ async function crawlDomain(domain: string, visited = new Set()) {
   const page = await browser.newPage();
   await page.goto(domain, { waitUntil: "networkidle" });
 
-  const text = await page.evaluate(() => document.body.innerText);
-  console.log(`collected data from ${domain}:\n${text.substring(0, 200)}...`);
+  // Extract meaningful content: titles, headings, paragraphs
+  const content = await page.evaluate(() => {
+    const title = document.title;
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3')).map(el => el.innerText.trim());
+    const paragraphs = Array.from(document.querySelectorAll('p')).map(el => el.innerText.trim());
+    const links = Array.from(document.querySelectorAll('a')).map(el => ({
+      text: el.innerText.trim(),
+      href: el.href,
+    }));
+
+    return {
+      title,
+      headings,
+      paragraphs,
+      links
+    };
+  });
+
+  // Structure it as a simple RAG document
+  const ragDocument = {
+    id: domain,
+    metadata: {
+      source: domain,
+      title: content.title
+    },
+    pageContent: [content.headings.join('\n'), content.paragraphs.join('\n')].join('\n\n'),
+  };
+
+  const allSplits = await splitter.splitDocuments([ragDocument]);
+
   const links = await page.evaluate(() =>
     Array.from(document.querySelectorAll("a"))
       .map(a => a.href)
@@ -36,7 +82,11 @@ async function crawlDomain(domain: string, visited = new Set()) {
   );
 
   await browser.close();
-  return [[domain, text], ...(await Promise.all(links.map(link => crawlDomain(link, visited))))];
+
+  await appendToJSONFile(allSplits, filePath);
+
+  return [[domain]];
+  // return [[domain], ...(await Promise.all(links.map(link => crawlDomain(link, filePath, visited))))];
 }
 
 export async function GET(req: NextRequest) {
@@ -48,13 +98,15 @@ export async function GET(req: NextRequest) {
   const allowedUrls = await getAllowedUrls(domain);
   // if (allowedUrls.length === 0) return Response.json({ status: 403, error: "denied by robots.txt" });
 
-  const data = await crawlDomain(domain);
   const filePath = path.join(process.cwd(), "data", `${new URL(domain).hostname}.json`);
-  writeFileSync(filePath, JSON.stringify(data, null, 2));
+  console.log('filePath = ', filePath);
+  // Clear file content if exists
+  writeFileSync(filePath, JSON.stringify([], null, 2), 'utf8');
+  const data = await crawlDomain(domain, filePath);
 
   return Response.json({
     status: 200,
-    message: `success for domain: ${domain}`,
+    message: `starting for domain: ${domain}...`,
     pages: data.length,
   });
 }

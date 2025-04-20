@@ -87,9 +87,11 @@ export async function POST(req: Request) {
       experimentalStreamTools: true,
     }),
     messages: messagesList,
+    /* TODO:
     tools: {
       weather: weatherTool,
     },
+    */
     onChunk({ chunk }) {
       console.log('onChunk = ', chunk);
     },
