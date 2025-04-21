@@ -1,7 +1,7 @@
 import { createOllama } from 'ollama-ai-provider';
 import { generateText } from 'ai';
 import { NextResponse } from "next/server";
-import {createBooking, getAvailableSlots, weatherTool} from "@/lib/tools";
+import {createBooking, getAvailableSlots, weatherTool, giveRelevanceScore, retrieverTool} from '@/lib/tools';
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -21,6 +21,8 @@ export async function GET(req: Request) {
       weather: weatherTool,
       available_slots: getAvailableSlots,
       create_booking: createBooking,
+      give_relevance_score: giveRelevanceScore,
+      retriever_tool: retrieverTool,
     },
     maxSteps: 5,
     onError({ error }) {
@@ -31,7 +33,9 @@ export async function GET(req: Request) {
       console.log('onStepFinish = ', text, toolCalls, toolResults, finishReason, usage);
     },
     // prompt: 'What is the weather in San Francisco?',
-    messages: [{ role: 'user', content: 'I want to book for Ivan ivan@test.ru 2025-04-21T12:00:00.000Z to 2025-04-21T12:30:00.000Z for Berlin timezone' }],
+    // TODO: get slots
+    messages: [{ role: 'user', content: 'I want to get info about Spain visa. Return link' }],
+    // messages: [{ role: 'user', content: 'I want to book for Ivan ivan@test.ru 2025-04-21T12:00:00.000Z to 2025-04-21T12:30:00.000Z for Berlin timezone' }],
   });
 
   return NextResponse.json(result);

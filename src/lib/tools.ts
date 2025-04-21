@@ -78,3 +78,35 @@ export const createBooking = tool({
     return result;
   },
 })
+
+// TODO: https://langchain-ai.github.io/langgraphjs/tutorials/rag/langgraph_agentic_rag/#nodes-and-edges:~:text=graph%20like%20this%3A-,Edges,-%C2%B6
+export const giveRelevanceScore = tool({
+  description: "Give a relevance score to the retrieved documents.",
+  parameters: z.object({
+    binaryScore: z.string().describe("Relevance score 'yes' or 'no'"),
+  }),
+  execute: async ({ binaryScore }) => {
+    console.log('binaryScore = ', binaryScore);
+  },
+});
+
+export const retrieverTool = tool({
+  parameters: z.object({
+    query: z.string().describe('The query search get the information for'),
+  }),
+  description: "Search and return information about visas, startups, countries and whole site s-hub.world",
+  execute: async ({ query }) => {
+    console.log('retrieverTool query = ', query);
+    const result = await fetch(`${'http://localhost:3000'}/api/vectors/generate?name=${'SHubWorld'}&query=${query}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => response.json())
+      .catch(err => console.error(err));
+    console.log('retrieverTool result = ', result)
+    // TODO: return as is
+    return result;
+  },
+});
