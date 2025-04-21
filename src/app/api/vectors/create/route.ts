@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import weaviate, {dataType, generative, vectorizer} from 'weaviate-client';
+import weaviate, {dataType, generative, tokenization, vectorizer} from 'weaviate-client';
 import { getClient } from '@/lib/weaviate-client';
-import {getClassName} from "@/lib/utils";
+import { getClassName } from '@/lib/utils';
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -23,7 +23,19 @@ export async function GET(req: NextRequest) {
     vectorizers: [
       weaviate.configure.vectorizer.text2VecOllama({
         name: 'text_vector',
-        sourceProperties: ['text'],
+        sourceProperties: ['text'/*, 'pageTitle'*/],
+        apiEndpoint: 'http://host.docker.internal:11434',  // If using Docker, use this to contact your local Ollama instance
+        model: 'nomic-embed-text',  // or 'snowflake-arctic-embed'
+      }),
+      weaviate.configure.vectorizer.text2VecOllama({
+        name: 'title_vector',
+        sourceProperties: ['pageTitle'],
+        apiEndpoint: 'http://host.docker.internal:11434',  // If using Docker, use this to contact your local Ollama instance
+        model: 'nomic-embed-text',  // or 'snowflake-arctic-embed'
+      }),
+      weaviate.configure.vectorizer.text2VecOllama({
+        name: 'section_vector',
+        sourceProperties: ['sectionTitle'],
         apiEndpoint: 'http://host.docker.internal:11434',  // If using Docker, use this to contact your local Ollama instance
         model: 'nomic-embed-text',  // or 'snowflake-arctic-embed'
       }),
@@ -32,6 +44,8 @@ export async function GET(req: NextRequest) {
       {
         name: 'text',
         dataType: dataType.TEXT,
+        vectorizePropertyName: true,
+        tokenization: tokenization.LOWERCASE
       },
       {
         name: 'pageUrl',
@@ -40,10 +54,14 @@ export async function GET(req: NextRequest) {
       {
         name: 'pageTitle',
         dataType: dataType.TEXT,
+        vectorizePropertyName: true,
+        tokenization: tokenization.LOWERCASE
       },
       {
         name: 'sectionTitle',
         dataType: dataType.TEXT,
+        vectorizePropertyName: true,
+        tokenization: tokenization.LOWERCASE
       },
       {
         name: 'elementType',

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClient } from '@/lib/weaviate-client';
-import {getClassName} from "@/lib/utils";
+import { getClassName } from '@/lib/utils';
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -22,10 +22,11 @@ export async function GET(req: NextRequest) {
   const data = await questions.generate.nearText(
     query || 'biology',
     {
-      groupedTask: task || 'Write a tweet with emojis about these facts.',
+      groupedTask: task || 'Write a tweet with emojis about these facts and add link.',
     },
     {
-      limit: 2,
+      targetVector: [/*'text_vector', */'title_vector', 'section_vector'],
+      limit: 3,
     }
   );
 
