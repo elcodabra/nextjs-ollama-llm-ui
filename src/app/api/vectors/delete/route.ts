@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import weaviate, { generative, vectorizer } from 'weaviate-client';
+import weaviate, {dataType, generative, vectorizer} from 'weaviate-client';
 import { getClient } from '@/lib/weaviate-client';
 import {getClassName} from "@/lib/utils";
 
@@ -10,21 +10,15 @@ const modelName = process.env.MODEL_NAME;
 
 export async function GET(req: NextRequest) {
   const name = req.nextUrl.searchParams.get("name");
-  const query = req.nextUrl.searchParams.get("query");
 
-  if (!name || !query) {
+  if (!name) {
     return NextResponse.json({ status: 'error', message: 'No name' });
   }
 
   const client = await getClient();
 
-  const questions = client.collections.get(getClassName(name));
+  // https://weaviate.io/developers/weaviate/model-providers/ollama/embeddings
+  await client.collections.delete(getClassName(name));
 
-  const length = await questions.length();
-
-  const data = await questions.query.nearText(query || 'biology', {
-    limit: 10,
-  });
-
-  return NextResponse.json({ status: 'ok', name: getClassName(name), length, data  });
+  return NextResponse.json({ status: 'ok', name: getClassName(name) });
 }

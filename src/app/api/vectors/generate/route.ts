@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClient } from '@/lib/weaviate-client';
+import {getClassName} from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -11,12 +12,12 @@ export async function GET(req: NextRequest) {
   const task = req.nextUrl.searchParams.get("task");
   const name = req.nextUrl.searchParams.get("name");
 
-  if (!name || !task || !query) {
-    return NextResponse.json({ status: 'error', message: 'No name, task or query' });
+  if (!name || !query) {
+    return NextResponse.json({ status: 'error', message: 'No name or query' });
   }
 
   const client = await getClient();
-  const questions = client.collections.get(name);
+  const questions = client.collections.get(getClassName(name));
 
   const data = await questions.generate.nearText(
     query || 'biology',

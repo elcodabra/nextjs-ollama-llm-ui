@@ -12,3 +12,12 @@ export function generateUUID(): string {
     return v.toString(16);
   });
 }
+
+export function getClassName(name: string): string {
+  return name
+    .replace(/[^a-zA-Z0-9]+/g, ' ') // Replace non-alphanumeric characters with space
+    .trim()                         // Trim leading/trailing spaces
+    .split(/\s+/)                   // Split by one or more spaces
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize
+    .join('');
+}
