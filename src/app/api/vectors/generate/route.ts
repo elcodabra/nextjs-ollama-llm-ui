@@ -9,7 +9,8 @@ const modelName = process.env.MODEL_NAME;
 
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("query");
-  const task = req.nextUrl.searchParams.get("task");
+  const task = req.nextUrl.searchParams.get("task") || 'Write a tweet with emojis about these facts and add link.';
+  const prompt = req.nextUrl.searchParams.get("prompt");
   const name = req.nextUrl.searchParams.get("name");
 
   if (!name || !query) {
@@ -22,7 +23,8 @@ export async function GET(req: NextRequest) {
   const data = await questions.generate.nearText(
     query || 'biology',
     {
-      groupedTask: task || 'Write a tweet with emojis about these facts and add link.',
+      ...(prompt ? { singlePrompt: prompt } : {}),
+      ...(task ? { groupedTask: task } : {}),
     },
     {
       targetVector: [/*'text_vector', */'title_vector', 'section_vector'],
