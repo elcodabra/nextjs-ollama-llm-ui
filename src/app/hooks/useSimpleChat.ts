@@ -49,7 +49,7 @@ export function useSimpleChat({
       setIsLoading(true);
 
       try {
-        const res = await fetch('/api/chat/text', {
+        const res = await fetch('/api/chat/rag', {
           method: 'POST',
           body: JSON.stringify({
             messages: updatedMessages.map(({ role, content }) => ({ role, content })),
@@ -87,8 +87,8 @@ export function useSimpleChat({
   const handleSubmit = async (e: React.FormEvent, requestOptions: ChatRequestOptions) => {
     e.preventDefault();
     if (!input.trim()) return;
-    await sendPrompt(input, requestOptions);
     setInput('');
+    await sendPrompt(input, requestOptions);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

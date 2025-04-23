@@ -100,14 +100,14 @@ export const giveRelevanceScore = tool({
   },
 });
 
-export const retrieverTool = tool({
+export const getRetrieverTool = (name: string) => tool({
   parameters: z.object({
     query: z.string().describe('The query search get the information for'),
   }),
   description: "Search and return information about visas, startups, countries and whole site s-hub.world",
   execute: async ({ query }) => {
     console.log('retrieverTool query = ', query);
-    const result = await fetch(`${'http://localhost:3000'}/api/vectors/generate?name=${'SHubWorld'}&query=${query}`, {
+    const result = await fetch(`${'http://localhost:3000'}/api/vectors/generate?name=${name}&query=${query}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
