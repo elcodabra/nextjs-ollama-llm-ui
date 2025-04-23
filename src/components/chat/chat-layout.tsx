@@ -12,11 +12,13 @@ import { Message, useChat } from "ai/react";
 import Chat, { ChatProps } from "./chat";
 import ChatList from "./chat-list";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import ChatSimple from "@/components/chat/chat-simple";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
+  isSimple?: boolean
 }
 
 type MergedProps = ChatLayoutProps & ChatProps;
@@ -27,6 +29,7 @@ export function ChatLayout({
   navCollapsedSize,
   initialMessages,
   id,
+  isSimple,
 }: MergedProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [isMobile, setIsMobile] = useState(false);
@@ -94,7 +97,11 @@ export function ChatLayout({
         className="h-full w-full flex justify-center"
         defaultSize={defaultLayout[1]}
       >
-        <Chat id={id} initialMessages={initialMessages} isMobile={isMobile} />
+        {isSimple ? (
+          <ChatSimple id={id} initialMessages={initialMessages} isMobile={isMobile} />
+          ) : (
+          <Chat id={id} initialMessages={initialMessages} isMobile={isMobile} />
+        )}
       </ResizablePanel>
     </ResizablePanelGroup>
   );

@@ -1,14 +1,16 @@
 import { createOllama } from 'ollama-ai-provider';
 import { generateText } from 'ai';
 import { NextResponse } from "next/server";
-import {createBooking, getAvailableSlots, weatherTool, giveRelevanceScore, retrieverTool} from '@/lib/tools';
+import { createBooking, getAvailableSlots, weatherTool, giveRelevanceScore, retrieverTool } from '@/lib/tools';
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // https://python.langchain.com/docs/integrations/chat/ollama/
 // https://chatgpt.com/c/680115e6-9b78-8013-adc9-26c3d5cba47b
-export async function GET(req: Request) {
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
   const OLLAMA_URL = process.env.OLLAMA_URL;
   console.log('OLLAMA_URL:', process.env.OLLAMA_URL);
 
@@ -34,7 +36,7 @@ export async function GET(req: Request) {
     },
     // prompt: 'What is the weather in San Francisco?',
     // TODO: get slots
-    messages: [{ role: 'user', content: 'I want to get info about Spain visa. Return link' }],
+    messages: messages || [{ role: 'user', content: 'I want to get info about Spain visa. Return pageUrl' }],
     // messages: [{ role: 'user', content: 'I want to book for Ivan ivan@test.ru 2025-04-21T12:00:00.000Z to 2025-04-21T12:30:00.000Z for Berlin timezone' }],
   });
 

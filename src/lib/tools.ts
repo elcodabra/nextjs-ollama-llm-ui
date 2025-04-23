@@ -5,6 +5,15 @@ export function getWeather(location: string): string {
   return `Погода в ${location} — солнечно, 22°C.`;
 }
 
+export const screenshotTool = tool({
+  parameters: z.object({}),
+  execute: async () => {
+    console.log('screenshotTool');
+    return 'imgbase64';
+  },
+  experimental_toToolResultContent: result => [{ type: 'image', data: result }],
+});
+
 export const weatherTool = tool({
   description: 'Get the weather in a location',
   parameters: z.object({
@@ -12,6 +21,7 @@ export const weatherTool = tool({
   }),
   // execute: async ({ location }) => getWeather(location),
   execute: async ({ location }) => {
+    console.log('weatherTool = ', location);
     return ({
       location,
       temperature: 72 + Math.floor(Math.random() * 21) - 10,

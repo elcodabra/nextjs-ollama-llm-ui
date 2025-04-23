@@ -9,7 +9,7 @@ import {
   InvalidToolArgumentsError,
   ToolExecutionError, generateText, createDataStreamResponse
 } from 'ai';
-import { weatherTool } from "@/lib/tools";
+import {screenshotTool, weatherTool} from "@/lib/tools";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -34,10 +34,13 @@ export async function POST(req: Request) {
     messageContent.push({ type: 'image', image });
   });
 
-  console.log('model = ', selectedModel, ollama(selectedModel));
+  console.log('model = ', selectedModel);
 
   const messagesList = [
-    // ...convertToCoreMessages(initialMessages),
+    { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
+    // { role: 'system', content: 'Ты дружелюбный чат-бот, который общается как хороший друг. Говори по-простому, тепло, без официальности. Не предлагай помощь, не веди себя как ассистент. Отвечай коротко, естественно — как будто переписываешься в чате. Можно с ноткой юмора или лёгкой иронии, если подходит.' },
+    ...convertToCoreMessages(initialMessages),
+    // ...initialMessages,
     { role: 'user', content: messageContent },
   ]
 
@@ -87,9 +90,18 @@ export async function POST(req: Request) {
       experimentalStreamTools: true,
     }),
     messages: messagesList,
+    /*
+    messages: convertToCoreMessages(messagesList, {
+      tools: {
+        weather: weatherTool,
+        screenshot: screenshotTool,
+      },
+    }),
+    */
     /* TODO:
     tools: {
       weather: weatherTool,
+      screenshot: screenshotTool,
     },
     */
     onChunk({ chunk }) {

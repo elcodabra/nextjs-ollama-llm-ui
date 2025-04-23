@@ -13,14 +13,15 @@ import { v4 as uuidv4 } from "uuid";
 import useChatStore from "@/app/hooks/useChatStore";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import {useSimpleChat} from "@/app/hooks/useSimpleChat";
 
-export interface ChatProps {
+export interface ChatSimpleProps {
   id: string;
   initialMessages: Message[] | [];
   isMobile?: boolean;
 }
 
-export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
+export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimpleProps) {
   const {
     messages,
     input,
@@ -31,7 +32,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     setMessages,
     setInput,
     reload,
-  } = useChat({
+  } = useSimpleChat({
     id,
     initialMessages,
     onResponse: (response) => {
@@ -43,7 +44,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       const savedMessages = getMessagesById(id);
       saveMessages(id, [...savedMessages, message]);
       setLoadingSubmit(false);
-      router.replace(`/c/${id}`);
+      router.replace(`/chat/${id}`);
     },
     onError: (error) => {
       setLoadingSubmit(false);
@@ -64,7 +65,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    window.history.replaceState({}, "", `/c/${id}`);
+    window.history.replaceState({}, "", `/chat/${id}`);
 
     if (!selectedModel) {
       toast.error("Please select a model");
