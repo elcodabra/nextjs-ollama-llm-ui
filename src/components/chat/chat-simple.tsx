@@ -21,6 +21,8 @@ export interface ChatSimpleProps {
   isMobile?: boolean;
 }
 
+const entityName = 'SHubWorld';
+
 export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimpleProps) {
   const {
     messages,
@@ -90,6 +92,7 @@ export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimple
     const requestOptions: ChatRequestOptions = {
       body: {
         selectedModel: selectedModel,
+        name: entityName,
       },
       ...(base64Images && {
         data: {
@@ -159,6 +162,7 @@ export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimple
               const requestOptions: ChatRequestOptions = {
                 body: {
                   selectedModel: selectedModel,
+                  name: entityName,
                 },
               };
 

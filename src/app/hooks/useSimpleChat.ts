@@ -16,6 +16,7 @@ type UseSimpleChatProps = {
   onFinish?: (message: Message) => void;
   onError?: (error: Error) => void;
   onToolCall?: (...args: any[]) => void;
+  onToolResult?: (...args: any[]) => void;
 };
 
 export function useSimpleChat({
@@ -25,6 +26,7 @@ export function useSimpleChat({
   onFinish,
   onError,
   onToolCall,
+  onToolResult,
 }: UseSimpleChatProps = {}) {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -73,7 +75,7 @@ export function useSimpleChat({
         onFinish?.(assistantMessage);
         // TODO: doesn't work
         onToolCall?.(data.toolCalls);
-        // onToolCall?.(data.toolResults);
+        onToolResult?.(data.toolResults);
       } catch (err: any) {
         onError?.(err);
         console.error('Chat error:', err);

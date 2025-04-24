@@ -84,6 +84,7 @@ export const createBooking = tool({
     })
       .then(response => response.json())
       .catch(err => console.error(err));
+    // TODO: status: 'error', errorMessage
     console.log('createBooking result = ', result)
     return result;
   },
@@ -100,13 +101,15 @@ export const giveRelevanceScore = tool({
   },
 });
 
+// TODO: giveRelevanceScore ?
 export const getRetrieverTool = (name: string) => tool({
   parameters: z.object({
-    query: z.string().describe('The query search get the information for'),
+    query: z.string().describe('The query search get the information about visas, startups, countries for'),
   }),
   description: "Search and return information about visas, startups, countries and whole site s-hub.world",
   execute: async ({ query }) => {
     console.log('retrieverTool query = ', query);
+    console.log('retrieverTool name = ', name);
     const result = await fetch(`${'http://localhost:3000'}/api/vectors/generate?name=${name}&query=${query}`, {
       method: 'GET',
       headers: {
@@ -115,8 +118,7 @@ export const getRetrieverTool = (name: string) => tool({
     })
       .then(response => response.json())
       .catch(err => console.error(err));
-    console.log('retrieverTool result = ', result)
-    // TODO: return as is
-    return result;
+    console.log('retrieverTool result = ', )
+    return { query, text: result.data.generated };
   },
 });
