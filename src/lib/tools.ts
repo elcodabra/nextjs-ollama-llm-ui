@@ -119,6 +119,6 @@ export const getRetrieverTool = (name: string) => tool({
       .then(response => response.json())
       .catch(err => console.error(err));
     console.log('retrieverTool result = ', )
-    return { query, text: result.data.generated };
+    return { query, text: result.data.generated, role: 'tool' };
   },
 });

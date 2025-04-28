@@ -39,6 +39,29 @@ export async function POST(req: Request) {
     {
       role: 'system',
       content: `
+        You are a grader assessing relevance of a retrieved document to a user question.
+        Here is the retrieved document:
+
+        <document>
+        {content}
+        </document>
+
+        Here is the user question:
+        <question>
+        {question}
+        </question>
+
+        If the document contains keywords related to the user question, grade it as relevant.
+        It does not need to be a stringent test. The goal is to filter out erroneous retrievals.
+        Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question.
+        Provide the binary score as a JSON with a single key 'score' and no preamble or explanation.
+      `,
+    },
+    */
+    /*
+    {
+      role: 'system',
+      content: `
       You are an assistant that can use tools.
       If you call a tool and receive a result, always include that result in your final message.
       Format your final answer clearly, ideally in JSON format, like this:
