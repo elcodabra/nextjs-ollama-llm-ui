@@ -1,15 +1,12 @@
-import { z } from 'zod';
 import { createOllama } from 'ollama-ai-provider';
 import {
   streamText,
   convertToCoreMessages,
   UserContent,
-  tool,
   NoSuchToolError,
   InvalidToolArgumentsError,
-  ToolExecutionError, generateText, createDataStreamResponse
+  ToolExecutionError,
 } from 'ai';
-import {screenshotTool, weatherTool} from "@/lib/tools";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";

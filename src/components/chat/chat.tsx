@@ -122,7 +122,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         isLoading={isLoading}
         chatId={id}
         messages={messages}
-        setMessages={setMessages}
       />
 
       {messages.length === 0 ? (

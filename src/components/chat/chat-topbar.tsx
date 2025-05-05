@@ -26,14 +26,12 @@ interface ChatTopbarProps {
   isLoading: boolean;
   chatId?: string;
   messages: Message[];
-  setMessages: (messages: Message[]) => void;
 }
 
 export default function ChatTopbar({
   isLoading,
   chatId,
   messages,
-  setMessages,
 }: ChatTopbarProps) {
   const [models, setModels] = React.useState<string[]>([]);
   const [open, setOpen] = React.useState(false);

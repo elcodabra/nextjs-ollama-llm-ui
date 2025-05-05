@@ -38,11 +38,11 @@ const useChatStore = create<State & Actions>()(
       base64Images: null,
       chats: {},
       currentChatId: null,
-      selectedModel: null,
+      selectedModel: process.env.MODEL_NAME || null,
       userName: "Anonymous",
       isDownloading: false,
       downloadProgress: 0,
-      downloadingModel: null, 
+      downloadingModel: null,
 
       setBase64Images: (base64Images) => set({ base64Images }),
       setUserName: (userName) => set({ userName }),
