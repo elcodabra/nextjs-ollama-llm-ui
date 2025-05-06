@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from 'next/script'
 import "../globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -25,6 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.0.375/pdf.min.mjs"
+          type="module"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className={`antialiased tracking-tight ${inter.className}`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           {children}

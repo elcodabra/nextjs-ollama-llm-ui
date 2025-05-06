@@ -31,6 +31,12 @@ export async function POST(req: Request) {
     messageContent.push({ type: 'image', image });
   });
 
+  // TODO: Add documents if they exist
+  data?.documents?.forEach((documentUrl: string) => {
+    const data = new URL(documentUrl);
+    messageContent.push({ type: 'file', data, mimeType: 'application/pdf' });
+  });
+
   console.log('model = ', selectedModel);
 
   const messagesList = [
