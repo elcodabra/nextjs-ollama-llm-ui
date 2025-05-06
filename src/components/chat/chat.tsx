@@ -57,8 +57,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
-  const base64Documents = useChatStore((state) => state.base64Documents);
-  const setBase64Documents = useChatStore((state) => state.setBase64Documents);
   const selectedModel = useChatStore((state) => state.selectedModel);
   const saveMessages = useChatStore((state) => state.saveMessages);
   const getMessagesById = useChatStore((state) => state.getMessagesById);
@@ -95,7 +93,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
       ...(base64Images && {
         data: {
           images: base64Images,
-          documents: base64Documents,
         },
         experimental_attachments: attachments,
       }),
@@ -104,7 +101,6 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     handleSubmit(e, requestOptions);
     saveMessages(id, [...messages, userMessage]);
     setBase64Images(null);
-    setBase64Documents(null);
   };
 
   const removeLatestMessage = () => {
