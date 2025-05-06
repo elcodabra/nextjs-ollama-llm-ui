@@ -1,5 +1,10 @@
+From `https://github.com/jakobhoeg/nextjs-ollama-llm-ui`
 
 Change `MODEL_NAME` in `.env`
+
+- llama3.1:latest
+- llama3.2-vision:latest
+- llava:latest
 
 1. Start Ollama
 ```
