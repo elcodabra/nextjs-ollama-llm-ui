@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
   // Add images if they exist
   data?.images?.forEach((imageUrl: string) => {
-    // const image = new URL(imageUrl);
+    /* const image = new URL(imageUrl); */
     messageContent.push({ type: 'image', image: imageUrl });
     /*
     messageContent.push({
