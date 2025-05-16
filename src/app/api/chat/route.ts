@@ -8,6 +8,22 @@ import {
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
+function errorHandler(error: unknown) {
+  if (error == null) {
+    return 'unknown error';
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return JSON.stringify(error);
+}
+
 export async function POST(req: Request) {
   // Destructure request data
   const { messages, selectedModel, data } = await req.json();
@@ -24,7 +40,7 @@ export async function POST(req: Request) {
 
   // Add images if they exist
   data?.images?.forEach((imageUrl: string) => {
-    /* const image = new URL(imageUrl); */
+    // const image = new URL(imageUrl);
     messageContent.push({ type: 'image', image: imageUrl });
     /*
     messageContent.push({
@@ -75,5 +91,7 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toDataStreamResponse();
+  return result.toDataStreamResponse({
+    getErrorMessage: errorHandler,
+  });
 }
