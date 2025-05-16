@@ -75,7 +75,5 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toDataStreamResponse({
-    getErrorMessage: errorHandler,
-  });
+  return result.toDataStreamResponse();
 }
