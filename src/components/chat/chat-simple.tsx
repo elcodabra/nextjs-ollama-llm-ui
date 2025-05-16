@@ -50,7 +50,7 @@ export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimple
     },
     onError: (error) => {
       setLoadingSubmit(false);
-      router.replace("/");
+      // router.replace("/");
       console.error(error.message);
       console.error(error.cause);
     },

@@ -21,6 +21,8 @@ export interface ChatProps {
 }
 
 export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
+  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
+
   const {
     messages,
     input,
@@ -47,13 +49,14 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
     },
     onError: (error) => {
       setLoadingSubmit(false);
-      router.replace("/");
+      // router.replace("/");
+      console.log('onError');
       console.error(error.message);
       console.error(error.cause);
+      toast.error(error.message || 'Unexpected error')
     },
     onToolCall: ({ toolCall }) => console.log('toolCall = ', toolCall)
   });
-  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);

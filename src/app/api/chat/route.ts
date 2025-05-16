@@ -24,27 +24,37 @@ export async function POST(req: Request) {
 
   // Add images if they exist
   data?.images?.forEach((imageUrl: string) => {
-    const image = new URL(imageUrl);
-    messageContent.push({ type: 'image', image });
+    // const image = new URL(imageUrl);
+    messageContent.push({ type: 'image', image: imageUrl });
+    /*
+    messageContent.push({
+      type: 'image_url',
+      image_url: {
+        url: imageUrl
+      }
+    });
+    */
   });
 
   // TODO: Add documents if they exist
   data?.documents?.forEach((documentUrl: string) => {
-    const data = new URL(documentUrl);
-    messageContent.push({ type: 'file', data, mimeType: 'application/pdf' });
+    // const data = new URL(documentUrl);
+    messageContent.push({ type: 'file', data: documentUrl, mimeType: 'application/pdf' });
   });
 
   console.log('model = ', selectedModel);
 
   const messagesList = [
-    { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
+    ...(process.env.SYSTEM_PROMPT ? [{ role: 'system', content: process.env.SYSTEM_PROMPT }] : []),
+    ...(process.env.USER_PROMPT ? [{ role: 'system', content: process.env.USER_PROMPT }] : []),
+    // { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
     // { role: 'system', content: 'Ты дружелюбный чат-бот, который общается как хороший друг. Говори по-простому, тепло, без официальности. Не предлагай помощь, не веди себя как ассистент. Отвечай коротко, естественно — как будто переписываешься в чате. Можно с ноткой юмора или лёгкой иронии, если подходит.' },
     ...convertToCoreMessages(initialMessages),
     // ...initialMessages,
     { role: 'user', content: messageContent },
   ]
 
-  // console.log('messagesList = ', messagesList);
+  console.log('messagesList = ', messagesList);
 
   // https://sdk.vercel.ai/docs/ai-sdk-core/tools-and-tool-calling
   // https://github.com/vercel/ai/issues/4700
@@ -62,12 +72,10 @@ export async function POST(req: Request) {
     },
     onFinish() {
       console.log('onFinish');
-      // newData.close();
-    },
-    onError({ error }) {
-      console.error('Error = ', error); // your error logging logic here
     },
   });
 
-  return result.toDataStreamResponse();
+  return result.toDataStreamResponse({
+    getErrorMessage: errorHandler,
+  });
 }
