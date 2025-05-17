@@ -33,7 +33,9 @@ export async function POST(req: Request) {
   const initialMessages = messages.slice(0, -1);
   const currentMessage = messages[messages.length - 1];
 
-  const ollama = createOllama({baseURL: ollamaUrl + "/api"});
+  const ollama = createOllama({baseURL: ollamaUrl + "/api", headers: {
+    'Origin': 'https://llm-ui-angry-team.vercel.app'
+  }});
 
   // Build message content array directly
   const messageContent: UserContent = [{ type: 'text', text: currentMessage.content }];
