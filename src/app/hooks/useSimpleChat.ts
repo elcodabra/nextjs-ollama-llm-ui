@@ -51,7 +51,7 @@ export function useSimpleChat({
       setIsLoading(true);
 
       try {
-        const res = await fetch('/api/chat/rag', {
+        const res = await fetch('/api/chat/text', {
           method: 'POST',
           body: JSON.stringify({
             messages: updatedMessages.map(({ role, content }) => ({ role, content })),

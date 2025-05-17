@@ -29,6 +29,8 @@ export async function POST(req: Request) {
   });
 
   const messagesList = [
+    ...(process.env.SYSTEM_PROMPT ? [{ role: 'system', content: process.env.SYSTEM_PROMPT }] : []),
+    ...(process.env.USER_PROMPT ? [{ role: 'system', content: process.env.USER_PROMPT }] : []),
     // { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
     // { role: 'system', content: 'Ты дружелюбный чат-бот, который общается как хороший друг. Говори по-простому, тепло, без официальности. Не предлагай помощь, не веди себя как ассистент. Отвечай коротко, естественно — как будто переписываешься в чате. Можно с ноткой юмора или лёгкой иронии, если подходит.' },
     ...convertToCoreMessages(initialMessages),
@@ -40,7 +42,7 @@ export async function POST(req: Request) {
     model: ollama(selectedModel || 'llama3.1:latest'),
     // model: ollama('yandex/YandexGPT-5-Lite-8B-instruct-GGUF:latest'),
     tools: {
-      weather: weatherTool,
+      // weather: weatherTool,
       available_slots: getAvailableSlots,
       create_booking: createBooking,
     },
