@@ -1,3 +1,5 @@
+import {NextResponse} from "next/server";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -7,5 +9,8 @@ export async function GET(req: Request) {
   const res = await fetch(
     OLLAMA_URL + "/api/tags"
   );
-  return new Response(res.body, res);
+  const json = await res.json()
+  // console.log(json);
+  // return new Response(res.body, res);
+  return NextResponse.json(json);
 }

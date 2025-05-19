@@ -33,11 +33,16 @@ export default function ChatTopbar({
   chatId,
   messages,
 }: ChatTopbarProps) {
+  const [isHydrated, setIsHydrated] = React.useState(false);
   const [models, setModels] = React.useState<string[]>([]);
   const [open, setOpen] = React.useState(false);
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const selectedModel = useChatStore((state) => state.selectedModel);
   const setSelectedModel = useChatStore((state) => state.setSelectedModel);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -91,7 +96,7 @@ export default function ChatTopbar({
             aria-expanded={open}
             className="w-[300px] justify-between"
           >
-            {selectedModel || "Select model"}
+            {isHydrated ? selectedModel || "Select model" : "Select model"}
             <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
