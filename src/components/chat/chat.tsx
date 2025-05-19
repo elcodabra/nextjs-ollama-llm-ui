@@ -143,7 +143,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
             input={input}
             handleInputChange={handleInputChange}
             handleSubmit={onSubmit}
-            isLoading={isLoading}
+            isLoading={isLoading || loadingSubmit}
             stop={handleStop}
             setInput={setInput}
           />
@@ -152,7 +152,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         <>
           <ChatList
             messages={messages}
-            isLoading={isLoading}
+            isLoading={isLoading || loadingSubmit}
             loadingSubmit={loadingSubmit}
             reload={async () => {
               removeLatestMessage();

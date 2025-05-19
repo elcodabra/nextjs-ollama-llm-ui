@@ -24,6 +24,7 @@ export interface ChatSimpleProps {
 const entityName = 'SHubWorld';
 
 export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimpleProps) {
+  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const {
     messages,
     input,
@@ -56,7 +57,6 @@ export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimple
     },
     onToolCall: ({ toolCall }) => console.log('toolCall = ', toolCall)
   });
-  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
@@ -145,7 +145,7 @@ export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimple
             input={input}
             handleInputChange={handleInputChange}
             handleSubmit={onSubmit}
-            isLoading={isLoading}
+            isLoading={isLoading || loadingSubmit}
             stop={handleStop}
             setInput={setInput}
           />
@@ -154,7 +154,7 @@ export default function ChatSimple({ initialMessages, id, isMobile }: ChatSimple
         <>
           <ChatList
             messages={messages}
-            isLoading={isLoading}
+            isLoading={isLoading || loadingSubmit}
             loadingSubmit={loadingSubmit}
             reload={async () => {
               removeLatestMessage();
