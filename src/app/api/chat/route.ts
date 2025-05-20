@@ -4,6 +4,7 @@ import {
   convertToCoreMessages,
   UserContent,
 } from 'ai';
+import {parseInt} from "lodash";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -78,6 +79,8 @@ export async function POST(req: Request) {
   // Stream text using the ollama model
   const result = await streamText({
     model: ollama(selectedModel),
+    ...(process.env.TEMPERATURE ? { temperature: parseFloat(process.env.TEMPERATURE) } : {}),
+    ...(process.env.MAX_TOKENS ? { maxTokens: parseInt(process.env.MAX_TOKENS) } : {}),
     messages: messagesList,
     onChunk({ chunk }) {
       // console.log('onChunk = ', chunk);

@@ -2,6 +2,7 @@ import { createOllama } from 'ollama-ai-provider';
 import { convertToCoreMessages, generateText, UserContent } from 'ai';
 import { NextResponse } from 'next/server';
 import { createBooking, getAvailableSlots, weatherTool } from '@/lib/tools';
+import {parseInt} from "lodash";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -46,6 +47,8 @@ export async function POST(req: Request) {
       available_slots: getAvailableSlots,
       create_booking: createBooking,
     },
+    ...(process.env.TEMPERATURE ? { temperature: parseFloat(process.env.TEMPERATURE) } : {}),
+    ...(process.env.MAX_TOKENS ? { maxTokens: parseInt(process.env.MAX_TOKENS) } : {}),
     maxSteps: 5,
     onError({ error }) {
       console.error('Error = ', error); // your error logging logic here
