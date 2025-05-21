@@ -38,6 +38,7 @@ const useChatStore = create<State & Actions>()(
       base64Images: null,
       chats: {},
       currentChatId: null,
+      selectedServer: 0,
       selectedModel: process.env.MODEL_NAME || null,
       userName: "Anonymous",
       isDownloading: false,

@@ -53,7 +53,7 @@ export default function ChatTopbar({
         const data = await res.json().catch(() => null);
         if (!data?.models?.length) return;
 
-        setModels(data.models.map(({ name }: { name: string }) => name));
+        setModels(data.models.map(({ name, server }: { name: string, server: number }) => `${name} ${server}`));
       } catch (error) {
         console.error("Error fetching models:", error);
       }

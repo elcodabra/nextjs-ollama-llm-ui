@@ -29,7 +29,10 @@ export async function POST(req: Request) {
   // Destructure request data
   const { messages, selectedModel, data } = await req.json();
 
-  const ollamaUrl = process.env.OLLAMA_URL;
+  const [model, server] = selectedModel.split(' ')
+
+  const ollamaUrl = (process.env.OLLAMA_URLS?.split(',') || [])[server];
+  console.log('OLLAMA_URL:', ollamaUrl);
 
   const initialMessages = messages.slice(0, -1);
   const currentMessage = messages[messages.length - 1];
@@ -78,7 +81,7 @@ export async function POST(req: Request) {
   // https://community.vercel.com/t/streamtext-tool-invocation-failure/7701
   // Stream text using the ollama model
   const result = await streamText({
-    model: ollama(selectedModel),
+    model: ollama(model),
     ...(process.env.TEMPERATURE ? { temperature: parseFloat(process.env.TEMPERATURE) } : {}),
     ...(process.env.MAX_TOKENS ? { maxTokens: parseInt(process.env.MAX_TOKENS) } : {}),
     messages: messagesList,
