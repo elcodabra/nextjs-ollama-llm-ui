@@ -27,7 +27,7 @@ export default function ChatList({
   return (
     <div className="flex-1 w-full overflow-y-auto">
       <ChatMessageList>
-        {messages.map((message, index) => (
+        {messages.filter(({ role }) => role !== 'system').map((message, index) => (
           <ChatMessage
             key={message.id || index}
             message={message}

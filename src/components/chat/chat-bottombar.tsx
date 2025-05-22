@@ -18,8 +18,9 @@ import useSpeechToText from "@/app/hooks/useSpeechRecognition";
 import MultiImagePicker from "../image-embedder";
 import useChatStore from "@/app/hooks/useChatStore";
 import Image from "next/image";
-import { ChatRequestOptions, Message } from "ai";
+import { ChatRequestOptions } from "ai";
 import { ChatInput } from "../ui/chat/chat-input";
+import ChatSettings from "@/components/chat-settings";
 
 interface ChatBottombarProps {
   handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -99,6 +100,7 @@ export default function ChatBottombar({
               <div className="flex w-full justify-between">
                 <MultiImagePicker disabled onImagesPick={setBase64Images} />
                 <div>
+                  <ChatSettings disabled />
                   <Button
                     className="shrink-0 rounded-full"
                     variant="ghost"
@@ -130,6 +132,7 @@ export default function ChatBottombar({
                   onImagesPick={setBase64Images}
                 />
                 <div>
+                  <ChatSettings disabled={isLoading} />
                   {/* Microphone button with animation when listening */}
                   <Button
                     className={`shrink-0 rounded-full ${

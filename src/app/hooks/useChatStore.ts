@@ -16,6 +16,9 @@ interface State {
   isDownloading: boolean;
   downloadProgress: number;
   downloadingModel: string | null;
+  systemMessage: string | null;
+  temperature: number | null;
+  maxTokens: number | null;
 }
 
 interface Actions {
@@ -30,6 +33,9 @@ interface Actions {
   startDownload: (modelName: string) => void;
   stopDownload: () => void;
   setDownloadProgress: (progress: number) => void;
+  setSystemMessage: (systemMessage?: string) => void;
+  setTemperature: (temperature?: number) => void;
+  setMaxTokens: (maxTokens?: number) => void;
 }
 
 const useChatStore = create<State & Actions>()(
@@ -39,14 +45,20 @@ const useChatStore = create<State & Actions>()(
       chats: {},
       currentChatId: null,
       selectedServer: 0,
-      selectedModel: process.env.MODEL_NAME || null,
+      selectedModel: process.env.NEXT_PUBLIC_MODEL_NAME || null,
       userName: "Anonymous",
       isDownloading: false,
       downloadProgress: 0,
       downloadingModel: null,
+      systemMessage: process.env.NEXT_PUBLIC_SYSTEM_PROMPT || null,
+      temperature: process.env.NEXT_PUBLIC_TEMPERATURE ? parseFloat(process.env.NEXT_PUBLIC_TEMPERATURE) : null,
+      maxTokens: process.env.NEXT_PUBLIC_MAX_TOKENS ? parseInt(process.env.NEXT_PUBLIC_MAX_TOKENS) : null,
 
       setBase64Images: (base64Images) => set({ base64Images }),
       setUserName: (userName) => set({ userName }),
+      setSystemMessage: (systemMessage) => set({ systemMessage }),
+      setTemperature: (temperature) => set({ temperature }),
+      setMaxTokens: (maxTokens) => set({ maxTokens }),
 
       setCurrentChatId: (chatId) => set({ currentChatId: chatId }),
       setSelectedModel: (selectedModel) => set({ selectedModel }),

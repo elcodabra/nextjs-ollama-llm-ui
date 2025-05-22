@@ -60,6 +60,8 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const base64Images = useChatStore((state) => state.base64Images);
   const setBase64Images = useChatStore((state) => state.setBase64Images);
+  const temperature = useChatStore((state) => state.temperature);
+  const maxTokens = useChatStore((state) => state.maxTokens);
   const selectedModel = useChatStore((state) => state.selectedModel);
   const saveMessages = useChatStore((state) => state.saveMessages);
   const getMessagesById = useChatStore((state) => state.getMessagesById);
@@ -91,7 +93,9 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
     const requestOptions: ChatRequestOptions = {
       body: {
-        selectedModel: selectedModel,
+        selectedModel,
+        temperature,
+        maxTokens,
       },
       ...(base64Images && {
         data: {
@@ -127,7 +131,7 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
         messages={messages}
       />
 
-      {messages.length === 0 ? (
+      {messages.filter(({ role }) => role !== 'system').length === 0 ? (
         <div className="flex flex-col h-full w-full items-center gap-4 justify-center">
           <Image
             src="/ollama.png"
@@ -159,7 +163,9 @@ export default function Chat({ initialMessages, id, isMobile }: ChatProps) {
 
               const requestOptions: ChatRequestOptions = {
                 body: {
-                  selectedModel: selectedModel,
+                  selectedModel,
+                  temperature,
+                  maxTokens,
                 },
               };
 

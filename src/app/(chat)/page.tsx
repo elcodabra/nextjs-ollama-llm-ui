@@ -18,6 +18,7 @@ export default function Home() {
   const [open, setOpen] = React.useState(false);
   const userName = useChatStore((state) => state.userName);
   const setUserName = useChatStore((state) => state.setUserName);
+  const systemMessage = useChatStore((state) => state.systemMessage);
 
   const onOpenChange = (isOpen: boolean) => {
     if (userName) return setOpen(isOpen);
@@ -32,7 +33,8 @@ export default function Home() {
         <ChatLayout
           key={id}
           id={id}
-          initialMessages={[]}
+          // initialMessages={[]}
+          initialMessages={systemMessage ? [{ id: generateUUID(), role: "system", content: systemMessage }] : []}
           navCollapsedSize={10}
           defaultLayout={[30, 160]}
         />
