@@ -4,6 +4,7 @@ import {
   convertToCoreMessages,
   UserContent,
 } from 'ai';
+import {Message} from "ai/react";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -35,6 +36,24 @@ export async function POST(req: Request) {
 
   const initialMessages = messages.slice(0, -1);
   const currentMessage = messages[messages.length - 1];
+
+  const recentMessages = initialMessages.filter(({ role }: Message) => role !== 'system').slice(0, -5);
+  let sumMessages;
+  console.log('Recent messages length:', recentMessages.length);
+  if (recentMessages.length >= 5) {
+    const res = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/chat/sum`, {
+      method: 'POST',
+      body: JSON.stringify({
+        selectedModel: 'tinyllama:latest',
+        messages: recentMessages,
+      }),
+    }).then(res => res.json());
+
+    console.log('chat/sum result = ', res);
+    if (res.text) {
+      sumMessages = [{role: 'system', content: `Summary of the conversation so far: ${res.text}`}]
+    }
+  }
 
   const ollama = createOllama({baseURL: ollamaUrl + "/api"});
 
@@ -68,8 +87,10 @@ export async function POST(req: Request) {
     ...(process.env.USER_PROMPT ? [{ role: 'system', content: process.env.USER_PROMPT }] : []),
     // { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
     // { role: 'system', content: 'Ты дружелюбный чат-бот, который общается как хороший друг. Говори по-простому, тепло, без официальности. Не предлагай помощь, не веди себя как ассистент. Отвечай коротко, естественно — как будто переписываешься в чате. Можно с ноткой юмора или лёгкой иронии, если подходит.' },
-    ...convertToCoreMessages(initialMessages),
-    // ...initialMessages,
+    ...convertToCoreMessages([
+      ...initialMessages.slice(0, initialMessages.length - recentMessages.length),
+      ...(sumMessages || recentMessages),
+    ]),
     { role: 'user', content: messageContent },
   ]
 
