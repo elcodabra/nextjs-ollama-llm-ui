@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const replyTo = body.replyTo
     const replyMarkup = body.replyMarkup
 
-    console.log('body=', body)
+    console.log('body=', JSON.stringify(body, null, 2))
 
     const message = body.message ? body.message : '<strong>test</strong>'
     console.log('message=', message)
