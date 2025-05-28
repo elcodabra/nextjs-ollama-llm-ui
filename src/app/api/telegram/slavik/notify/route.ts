@@ -17,16 +17,7 @@ export async function POST(req: NextRequest) {
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${tgbot}/sendMessage`;
 
     // TODO: generate response from ai
-
-    // TODO: role = 'user'
-    const query = `
-      SELECT * FROM messages
-      WHERE chatId = $1
-      ORDER BY createdAt ASC;
-    `;
-
-    const result = await pool.query(query, [chatId]);
-    console.log('result.rows = ', JSON.stringify(result.rows, null, 2));
+    console.log('chatId=', chatId);
 
     const ret = await fetch(TELEGRAM_API_URL, {
         method: 'POST',

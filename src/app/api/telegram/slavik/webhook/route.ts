@@ -35,11 +35,21 @@ export async function POST(req: NextRequest) {
       }
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else {
+      // TODO: role = 'user'
+      const querySelect = `
+        SELECT * FROM public.messages
+        WHERE chatid = $1 AND userrole = 'user'
+        ORDER BY createdat ASC;
+      `;
+
+      const resultSelect = await pool.query(querySelect, [chatId]);
+      console.log('resultSelect.rows = ', JSON.stringify(resultSelect.rows, null, 2));
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || 'http://localhost:3000'}/api/chat/slavik`, {
         method: 'POST',
         body: JSON.stringify({
           // TODO: history
-          messages: [{
+          messages: [...resultSelect.rows.map(({ message }: any) => ({ role: 'user', content: message })) || [], {
             role: 'user',
             content: message,
           }],

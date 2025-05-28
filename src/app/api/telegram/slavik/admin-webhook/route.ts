@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
         VALUES ($1, $2, $3, $4)
         RETURNING *;
       `;
-      const result = await pool.query(query, [null, 'assistant', chatId, body.callback_query.message.text]);
+      const result = await pool.query(query, [null, 'assistant', callbackQuery.chatId, body.callback_query.message.text]);
       console.log('db result = ', result);
     }
     return NextResponse.json({ status: 'ok' });
