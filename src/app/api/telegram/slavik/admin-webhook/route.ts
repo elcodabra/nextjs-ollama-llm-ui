@@ -4,7 +4,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    console.log('Incoming Telegram update:', JSON.stringify(body, null, 2));
+    console.log('Incoming Telegram update for Admin:', JSON.stringify(body, null, 2));
 
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
