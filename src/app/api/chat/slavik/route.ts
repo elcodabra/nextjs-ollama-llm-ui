@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     messageContent.push({ type: 'file', data: documentUrl, mimeType: 'application/pdf' });
   });
 
-  console.log('model = ', selectedModel);
+  console.log('model = ', model);
 
   const messagesList = [
     ...(process.env.NEXT_PUBLIC_SYSTEM_PROMPT ? [{ role: 'system', content: process.env.NEXT_PUBLIC_SYSTEM_PROMPT }] : []),
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     { role: 'user', content: messageContent },
   ]
 
-  console.log('messagesList = ', messagesList);
+  console.log('messagesList = ', JSON.stringify(messagesList, null, 2));
 
   // https://sdk.vercel.ai/docs/ai-sdk-core/tools-and-tool-calling
   // https://github.com/vercel/ai/issues/4700
