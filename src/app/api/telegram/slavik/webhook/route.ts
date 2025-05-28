@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {notify} from "@/lib/notify";
+import { notify } from '@/lib/notify';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,9 +16,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: 'ignored' });
     }
 
-    await notify({
+    const ret = await notify({
       message: `Message from ${firstName}: ${message}`,
-    })
+    }).then((r) => r.json());
 
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_TELEGRAM_BOT_TOKEN;
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
         }),
       }).then(res => res.json());
       await notify({
-        message: response?.text || 'error',
+        message: response?.text ? `Response from AI: ${response.text}` : 'error',
+        replyTo: ret?.data?.result?.message_id,
       })
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
     }
