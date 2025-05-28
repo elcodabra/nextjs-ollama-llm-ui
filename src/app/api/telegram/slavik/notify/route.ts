@@ -13,9 +13,9 @@ export async function POST(req: NextRequest) {
 
     const ret = await fetch(
       `https://api.telegram.org/bot${tgbot}/sendMessage?chat_id=${chatId}&text=${message}&disable_web_page_preview=true&parse_mode=HTML`
-    )
+    ).then(res => res.json())
 
-    console.log(ret)
+    console.log(ret);
 
     return NextResponse.json({ status: 'OK' })
   } catch (error) {
