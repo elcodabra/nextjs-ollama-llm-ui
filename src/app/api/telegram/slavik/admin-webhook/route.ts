@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import pool from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,6 +25,14 @@ export async function POST(req: NextRequest) {
       const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${body.callback_query.message.text}&parse_mode=HTML`;
       console.log('ANSWER_TELEGRAM_URL = ', ANSWER_TELEGRAM_URL);
       await fetch(ANSWER_TELEGRAM_URL);
+
+      const query = `
+        INSERT INTO messages (userId, userRole, chatId, message)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+      `;
+      const result = await pool.query(query, [null, 'assistant', chatId, body.callback_query.message.text]);
+      console.log('db result = ', result);
     }
     return NextResponse.json({ status: 'ok' });
   } catch (error) {

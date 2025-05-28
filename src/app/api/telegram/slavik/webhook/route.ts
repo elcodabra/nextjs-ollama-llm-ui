@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notify } from '@/lib/notify';
+import pool from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,6 +70,13 @@ export async function POST(req: NextRequest) {
           ]
         }
       })
+      const query = `
+        INSERT INTO messages (userId, userRole, chatId, message)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+      `;
+      const result = await pool.query(query, [userName ?? null, 'user', chatId, message]);
+      console.log('db result = ', result);
       // await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
     }
 
