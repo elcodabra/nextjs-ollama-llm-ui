@@ -45,25 +45,24 @@ export async function POST(req: NextRequest) {
         }),
       }).then(res => res.json());
       await notify({
-        message: response?.text ? `Response from AI: ${response.text}` : 'error',
+        message: response?.text || 'error',
         replyTo: ret?.data?.result?.message_id,
         replyMarkup: {
           inline_keyboard: [
             [
               {
                 "text": "OK",
-                "callback_data": JSON.stringify({
-                  url: `${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`
-                }),
+                // Limit = 64 bytes
+                "callback_data": JSON.stringify({ chatId }),
               },
               /*
               {
                 "text": "Retry",
-                "callback_data": JSON.stringify({}),
+                "callback_data": "",
               },
               {
                 "text": "Ask to pay",
-                "callback_data": JSON.stringify({}),
+                "callback_data": "",
               }
               */
             ]

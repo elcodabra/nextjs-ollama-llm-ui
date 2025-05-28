@@ -20,8 +20,9 @@ export async function POST(req: NextRequest) {
     if (message === '/start') {
       const text = 'started'
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
-    } else if (callbackQuery?.url) {
-      await fetch(callbackQuery.url);
+    } else if (callbackQuery?.chatId) {
+      const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${message}&parse_mode=HTML`;
+      await fetch(ANSWER_TELEGRAM_URL);
     }
     return NextResponse.json({ status: 'ok' });
   } catch (error) {

@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
 
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${tgbot}/sendMessage`;
 
+    // TODO: generate response from ai
+
     const ret = await fetch(TELEGRAM_API_URL, {
         method: 'POST',
         headers: {
@@ -22,6 +24,7 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           chat_id: chatId,
+          // text: replyTo ? `Response from AI: ${message}` : message,
           text: message,
           ...replyTo ? { reply_to_message_id: replyTo } : {},
           disable_web_page_preview: true,
@@ -31,7 +34,7 @@ export async function POST(req: NextRequest) {
       }
     ).then(res => res.json())
 
-    console.log(ret);
+    console.log('notify response = ', ret);
 
     return NextResponse.json({ status: 'OK', data: ret });
   } catch (error) {
