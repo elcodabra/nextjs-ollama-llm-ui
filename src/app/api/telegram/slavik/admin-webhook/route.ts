@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
-    const callbackQuery = body.callback_query ? JSON.parse(body.callback_query) : null;
+    const callbackQuery = body.callback_query ? JSON.parse(body.callback_query.data) : null;
 
     if (!message || !chatId || !callbackQuery) {
       return NextResponse.json({ status: 'ignored' });
