@@ -4,7 +4,7 @@ interface Body {
 }
 
 export async function notify(body: Body) {
-  const res = await fetch((process.env.VERCEL_URL || '') + '/api/telegram/notify', {
+  const res = await fetch((process.env.NEXT_HOST || '') + '/api/telegram/notify', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
