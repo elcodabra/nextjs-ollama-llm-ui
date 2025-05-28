@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else {
-      const response = await fetch(`${process.env.NEXT_HOST || 'http://localhost:3000'}/api/chat/slavik`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || 'http://localhost:3000'}/api/chat/slavik`, {
         method: 'POST',
         body: JSON.stringify({
           // TODO: history
