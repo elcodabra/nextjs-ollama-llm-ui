@@ -21,7 +21,8 @@ export async function POST(req: NextRequest) {
       const text = 'started'
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else if (callbackQuery?.chatId) {
-      const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${message}&parse_mode=HTML`;
+      const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${body.callback_query.message.text}&parse_mode=HTML`;
+      console.log('ANSWER_TELEGRAM_URL = ', ANSWER_TELEGRAM_URL);
       await fetch(ANSWER_TELEGRAM_URL);
     }
     return NextResponse.json({ status: 'ok' });
