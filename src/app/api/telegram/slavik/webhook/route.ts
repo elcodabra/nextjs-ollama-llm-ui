@@ -10,15 +10,19 @@ export async function POST(req: NextRequest) {
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
     const firstName = body.message?.from.first_name
-    // TODO: is_bot, last_name, username, language_code, is_premium
+    const lastName = body.message?.from.last_name
+    const userName = body.message?.from.user_name
+    const languageCode = body.message?.from.language_code
+    const isPremium = body.message?.from.is_premium
+    // TODO: is_bot, is_premium
 
     if (!message || !chatId) {
       return NextResponse.json({ status: 'ignored' });
     }
 
     const ret = await notify({
-      message: `Message from ${firstName}: ${message}`,
-    }).then((r) => r.json());
+      message: `Message from @${userName} (${isPremium ? '⭐' : ''}${firstName} ${lastName}): ${message}`,
+    });
 
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_TELEGRAM_BOT_TOKEN;
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
