@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
     const firstName = body.message?.from.first_name
+    // TODO: is_bot, last_name, username, language_code, is_premium
 
     if (!message || !chatId) {
       return NextResponse.json({ status: 'ignored' });
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
         'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000'}/api/chat/slavik`, {
+      const response = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/chat/slavik`, {
         method: 'POST',
         body: JSON.stringify({
           // TODO: history

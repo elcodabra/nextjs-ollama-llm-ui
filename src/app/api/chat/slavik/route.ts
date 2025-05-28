@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   let sumMessages;
   console.log('Recent messages length:', recentMessages.length);
   if (recentMessages.length >= 5) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000'}/api/chat/sum`, {
+    const res = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/chat/sum`, {
       method: 'POST',
       body: JSON.stringify({
         selectedModel: 'tinyllama:latest',
