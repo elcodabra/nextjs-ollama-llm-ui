@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {notify} from "@/lib/notify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,30 +9,38 @@ export async function POST(req: NextRequest) {
 
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
+    const firstName = body.message?.from.first_name
 
     if (!message || !chatId) {
       return NextResponse.json({ status: 'ignored' });
     }
 
-    // TODO: send message to admin bot and group
+    await notify({
+      message: `Message from ${firstName}: ${message}`,
+    })
 
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_TELEGRAM_BOT_TOKEN;
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     if (message === '/start') {
-      const response =
-        'Hi, <b>' +
-        body.message.from.first_name +
-        '</b>I\'m <i>Slavik</i>.%0APlease, ask your questions%0A'
-      await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${response}&parse_mode=HTML`
-      )
+      const text =
+        'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
+      await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else {
-      const response =
-        'Help for <i>S-HUB.world News Channel</i>.%0AUse /search <i>keyword</i> to search for <i>keyword</i> in my Medium publication'
-      const ret = await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${response}&parse_mode=HTML`
-      )
+      const response = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || 'http://localhost:3000'}/api/chat/slavik`, {
+        method: 'POST',
+        body: JSON.stringify({
+          // TODO: history
+          messages: [{
+            role: 'user',
+            content: message,
+          }],
+        }),
+      }).then(res => res.json());
+      await notify({
+        message: response?.text || 'error',
+      })
+      await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
     }
 
     return NextResponse.json({ status: 'ok' });
