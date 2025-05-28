@@ -1,35 +1,18 @@
 import { createOllama } from 'ollama-ai-provider';
 import {
-  streamText,
   convertToCoreMessages,
-  UserContent,
+  UserContent, generateText,
 } from 'ai';
 import {Message} from "ai/react";
+import {NextResponse} from "next/server";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
-function errorHandler(error: unknown) {
-  if (error == null) {
-    return 'unknown error';
-  }
-
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return JSON.stringify(error);
-}
-
 export async function POST(req: Request) {
-  // Destructure request data
   const { messages, selectedModel, data, temperature, maxTokens } = await req.json();
 
-  const [model, server] = selectedModel.split(' ')
+  const [model, server] = selectedModel?.split(' ') || [process.env.NEXT_PUBLIC_MODEL_NAME, 0]
 
   const ollamaUrl = (process.env.OLLAMA_URLS?.split(',') || [])[server];
   console.log('OLLAMA_URL:', ollamaUrl);
@@ -83,10 +66,7 @@ export async function POST(req: Request) {
   console.log('model = ', selectedModel);
 
   const messagesList = [
-    ...(process.env.SYSTEM_PROMPT ? [{ role: 'system', content: process.env.SYSTEM_PROMPT }] : []),
-    ...(process.env.USER_PROMPT ? [{ role: 'system', content: process.env.USER_PROMPT }] : []),
-    // { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
-    // { role: 'system', content: 'Ты дружелюбный чат-бот, который общается как хороший друг. Говори по-простому, тепло, без официальности. Не предлагай помощь, не веди себя как ассистент. Отвечай коротко, естественно — как будто переписываешься в чате. Можно с ноткой юмора или лёгкой иронии, если подходит.' },
+    ...(process.env.NEXT_PUBLIC_SYSTEM_PROMPT ? [{ role: 'system', content: process.env.NEXT_PUBLIC_SYSTEM_PROMPT }] : []),
     ...convertToCoreMessages([
       ...initialMessages.slice(0, initialMessages.length - recentMessages.length),
       ...(sumMessages || recentMessages),
@@ -100,7 +80,7 @@ export async function POST(req: Request) {
   // https://github.com/vercel/ai/issues/4700
   // https://community.vercel.com/t/streamtext-tool-invocation-failure/7701
   // Stream text using the ollama model
-  const result = await streamText({
+  const result = await generateText({
     model: ollama(model),
     ...(temperature ? { temperature } : {}),
     ...(maxTokens ? { maxTokens } : {}),
@@ -115,9 +95,8 @@ export async function POST(req: Request) {
     onFinish() {
       console.log('onFinish');
     },
+    maxSteps: 2,
   });
 
-  return result.toDataStreamResponse({
-    getErrorMessage: errorHandler,
-  });
+  return NextResponse.json(result);
 }
