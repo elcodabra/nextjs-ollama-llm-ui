@@ -47,8 +47,30 @@ export async function POST(req: NextRequest) {
       await notify({
         message: response?.text ? `Response from AI: ${response.text}` : 'error',
         replyTo: ret?.data?.result?.message_id,
+        replyMarkup: {
+          inline_keyboard: [
+            [
+              {
+                "text": "OK",
+                "callback_data": JSON.stringify({
+                  url: `${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`
+                }),
+              },
+              /*
+              {
+                "text": "Retry",
+                "callback_data": JSON.stringify({}),
+              },
+              {
+                "text": "Ask to pay",
+                "callback_data": JSON.stringify({}),
+              }
+              */
+            ]
+          ]
+        }
       })
-      await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
+      // await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
     }
 
     return NextResponse.json({ status: 'ok' });

@@ -6,6 +6,7 @@ export async function POST(req: NextRequest) {
     const tgbot = process.env.SLAVIK_ADMIN_TELEGRAM_BOT_TOKEN
     const chatId = body.chatId || process.env.SLAVIK_ADMIN_TELEGRAM_CHAT_ID
     const replyTo = body.replyTo
+    const replyMarkup = body.replyMarkup
 
     console.log('body=', body)
 
@@ -14,9 +15,20 @@ export async function POST(req: NextRequest) {
 
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${tgbot}/sendMessage`;
 
-    console.log(`${TELEGRAM_API_URL}?chat_id=${chatId}${replyTo ? `&reply_to_message_id=${replyTo}` : ''}&text=${message}&disable_web_page_preview=true&parse_mode=HTML`)
-    const ret = await fetch(
-      `${TELEGRAM_API_URL}?chat_id=${chatId}${replyTo ? `&reply_to_message_id=${replyTo}` : ''}&text=${message}&disable_web_page_preview=true&parse_mode=HTML`
+    const ret = await fetch(TELEGRAM_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          ...replyTo ? { reply_to_message_id: replyTo } : {},
+          disable_web_page_preview: true,
+          parse_mode: 'HTML',
+          ...replyMarkup ? { reply_markup: replyMarkup } : {},
+        }),
+      }
     ).then(res => res.json())
 
     console.log(ret);

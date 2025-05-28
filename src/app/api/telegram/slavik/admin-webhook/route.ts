@@ -8,8 +8,9 @@ export async function POST(req: NextRequest) {
 
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
+    const callbackQuery = body.callback_query ? JSON.parse(body.callback_query) : null;
 
-    if (!message || !chatId) {
+    if (!message || !chatId || !callbackQuery) {
       return NextResponse.json({ status: 'ignored' });
     }
 
@@ -19,6 +20,8 @@ export async function POST(req: NextRequest) {
     if (message === '/start') {
       const text = 'started'
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
+    } else if (callbackQuery?.url) {
+      await fetch(callbackQuery.url);
     }
     return NextResponse.json({ status: 'ok' });
   } catch (error) {

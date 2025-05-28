@@ -1,6 +1,8 @@
 interface Body {
   chatId?: string
   replyTo?: string
+  // TODO:
+  replyMarkup?: any
   message: string
 }
 
