@@ -11,10 +11,10 @@ export async function POST(req: NextRequest) {
     const chatId = body.message?.chat?.id;
     const firstName = body.message?.from.first_name
     const lastName = body.message?.from.last_name
-    const userName = body.message?.from.user_name
+    const userName = body.message?.from.username
     const languageCode = body.message?.from.language_code
     const isPremium = body.message?.from.is_premium
-    // TODO: is_bot, is_premium
+    // TODO: is_bot
 
     if (!message || !chatId) {
       return NextResponse.json({ status: 'ignored' });
@@ -28,8 +28,10 @@ export async function POST(req: NextRequest) {
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     if (message === '/start') {
-      const text =
-        'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
+      let text = 'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
+      if (languageCode === 'ru') {
+        text = 'Привет, <b>' + firstName + '</b>. Меня зовут <b>Славик</b>.%0AНе стесняйся задавай свои вопросы%0A'
+      }
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else {
       const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || 'http://localhost:3000'}/api/chat/slavik`, {
