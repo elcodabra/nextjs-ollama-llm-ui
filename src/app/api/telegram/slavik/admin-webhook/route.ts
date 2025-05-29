@@ -27,9 +27,10 @@ export async function POST(req: NextRequest) {
           FROM public.messages;
       `;
       const result = await pool.query(query);
-      const text = '<b>Count: ' + result.rows.length + '</b>%0A' + result.rows.map((row: any) => `@${row.userid}`).join('%0A');
+      const filtered = result.rows.filter((row: any) => !!row.userid);
+      const text = '<b>Count: ' + filtered.length + '</b>%0A' + filtered.map((row: any) => `@${row.userid}`).join('%0A');
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
-    } else if (message.startsWith('/get_user_messages')) {
+    } else if (message.startsWith('/get_user_messages ')) {
       const userId = message.split(' ')[1].replace('@', '');
       const query = `
           SELECT *
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
           ORDER BY createdat ASC
       `;
       const result = await pool.query(query, [userId]);
-      const text = '<b>Count: ' + result.rows.length + '</b>%0A' + result.rows.map((row: any) => `@${row.userid}`).join('%0A');
+      const text = '<b>Count: ' + result.rows.length + '</b>%0A' + result.rows.map((row: any) => `${row.userrole}: ${row.message}`).join('%0A');
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
     } else if (callbackQuery?.chatId) {
       const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${body.callback_query.message.text}&parse_mode=HTML`;
