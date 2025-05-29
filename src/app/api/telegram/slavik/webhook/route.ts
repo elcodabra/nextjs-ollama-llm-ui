@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { notify } from '@/lib/notify';
+import {NextRequest, NextResponse} from 'next/server';
+import {notify} from '@/lib/notify';
 import pool from '@/lib/db';
 
 export async function POST(req: NextRequest) {
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     // TODO: is_bot
 
     if (!message || !chatId) {
-      return NextResponse.json({ status: 'ignored' });
+      return NextResponse.json({status: 'ignored'});
     }
 
     const ret = await notify({
@@ -37,9 +37,11 @@ export async function POST(req: NextRequest) {
     } else {
       // TODO: role = 'user'
       const querySelect = `
-        SELECT * FROM public.messages
-        WHERE chatid = $1 AND userrole = 'user'
-        ORDER BY createdat ASC;
+          SELECT *
+          FROM public.messages
+          WHERE chatid = $1
+            AND userrole = 'user'
+          ORDER BY createdat ASC;
       `;
 
       const resultSelect = await pool.query(querySelect, [chatId]);
@@ -49,7 +51,12 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         body: JSON.stringify({
           // TODO: history
-          messages: [...resultSelect.rows.map(({ message }: any) => ({ role: 'user', content: message })) || [], {
+          messages: [...resultSelect.rows.map(({message}: any) => ({
+            role: 'user', content: {
+              type: "text",
+              text: message,
+            }
+          })) || [], {
             role: 'user',
             content: message,
           }],
@@ -64,7 +71,7 @@ export async function POST(req: NextRequest) {
               {
                 "text": "OK",
                 // Limit = 64 bytes
-                "callback_data": JSON.stringify({ chatId }),
+                "callback_data": JSON.stringify({chatId, userName}),
               },
               /*
               {
@@ -81,18 +88,17 @@ export async function POST(req: NextRequest) {
         }
       })
       const query = `
-        INSERT INTO messages (userId, userRole, chatId, message)
-        VALUES ($1, $2, $3, $4)
-        RETURNING *;
+          INSERT INTO messages (userId, userRole, chatId, message)
+          VALUES ($1, $2, $3, $4) RETURNING *;
       `;
       const result = await pool.query(query, [userName ?? null, 'user', chatId, message]);
       console.log('db result = ', result);
       // await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
     }
 
-    return NextResponse.json({ status: 'ok' });
+    return NextResponse.json({status: 'ok'});
   } catch (error) {
     console.error('Telegram webhook error:', error);
-    return NextResponse.json({ status: 'error', message: (error as Error).message }, { status: 500 });
+    return NextResponse.json({status: 'error', message: (error as Error).message}, {status: 500});
   }
 }
