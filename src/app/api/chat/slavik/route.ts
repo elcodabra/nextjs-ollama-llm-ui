@@ -88,7 +88,7 @@ export async function POST(req: Request) {
   // Stream text using the ollama model
   const result = await generateText({
     // model: ollama(model),
-    model: openai('gpt-4.1-mini'),
+    model: openai('gpt-4o'),
     ...(temperature ? { temperature } : {}),
     ...(maxTokens ? { maxTokens } : {}),
     messages: messagesList,
