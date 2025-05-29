@@ -1,21 +1,25 @@
-import { createOllama } from 'ollama-ai-provider';
+// import { createOllama } from 'ollama-ai-provider';
 import {
   convertToCoreMessages,
   UserContent, generateText,
 } from 'ai';
 import {Message} from "ai/react";
 import {NextResponse} from "next/server";
+import { openai } from '@ai-sdk/openai';
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
+// Allow responses up to 5 minutes
+export const maxDuration = 300;
+
 export async function POST(req: Request) {
   const { messages, selectedModel, data, temperature, maxTokens } = await req.json();
 
-  const [model, server] = selectedModel?.split(' ') || [process.env.NEXT_PUBLIC_MODEL_NAME, 0]
+  // const [model, server] = selectedModel?.split(' ') || [process.env.NEXT_PUBLIC_MODEL_NAME, 0]
 
-  const ollamaUrl = (process.env.OLLAMA_URLS?.split(',') || [])[server];
-  console.log('OLLAMA_URL:', ollamaUrl);
+  // const ollamaUrl = (process.env.OLLAMA_URLS?.split(',') || [])[server];
+  // console.log('OLLAMA_URL:', ollamaUrl);
 
   const initialMessages = messages.slice(0, -1);
   const currentMessage = messages[messages.length - 1];
@@ -38,7 +42,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const ollama = createOllama({baseURL: ollamaUrl + "/api"});
+  // const ollama = createOllama({baseURL: ollamaUrl + "/api"});
 
   // Build message content array directly
   const messageContent: UserContent = [{ type: 'text', text: currentMessage.content }];
@@ -63,7 +67,7 @@ export async function POST(req: Request) {
     messageContent.push({ type: 'file', data: documentUrl, mimeType: 'application/pdf' });
   });
 
-  console.log('model = ', model);
+  // console.log('model = ', model);
 
   const messagesList = [
     ...(process.env.NEXT_PUBLIC_SYSTEM_PROMPT ? [{ role: 'system', content: process.env.NEXT_PUBLIC_SYSTEM_PROMPT }] : []),
@@ -81,7 +85,8 @@ export async function POST(req: Request) {
   // https://community.vercel.com/t/streamtext-tool-invocation-failure/7701
   // Stream text using the ollama model
   const result = await generateText({
-    model: ollama(model),
+    // model: ollama(model),
+    model: openai('gpt-4.1-mini'),
     ...(temperature ? { temperature } : {}),
     ...(maxTokens ? { maxTokens } : {}),
     messages: messagesList,
