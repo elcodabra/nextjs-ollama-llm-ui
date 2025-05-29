@@ -24,6 +24,8 @@ export async function POST(req: Request) {
   const initialMessages = messages.slice(0, -1);
   const currentMessage = messages[messages.length - 1];
 
+  console.log('messages = ', messages);
+
   const recentMessages = initialMessages.filter(({ role }: Message) => role !== 'system').slice(0, -5);
   let sumMessages;
   console.log('Recent messages length:', recentMessages.length);
@@ -75,7 +77,7 @@ export async function POST(req: Request) {
       ...initialMessages.slice(0, initialMessages.length - recentMessages.length),
       ...(sumMessages || recentMessages),
     ]),
-    { role: 'user', content: messageContent },
+    { role: 'user', content: currentMessage.content },
   ]
 
   console.log('messagesList = ', JSON.stringify(messagesList, null, 2));

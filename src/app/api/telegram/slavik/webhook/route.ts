@@ -52,10 +52,10 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           // TODO: history
           messages: [...resultSelect.rows.map(({message}: any) => ({
-            role: 'user', content: {
+            role: 'user', content: message, /* {
               type: "text",
               text: message,
-            }
+            } */
           })) || [], {
             role: 'user',
             content: message,
