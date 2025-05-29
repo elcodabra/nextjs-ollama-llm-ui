@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       const filtered = result.rows.filter((row: any) => !!row.userid);
       const text = '<b>Count: ' + filtered.length + '</b>%0A' + filtered.map((row: any) => `@${row.userid}`).join('%0A');
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
-    } else if (message.startsWith('/get_user_messages ')) {
+    } else if (message?.startsWith('/get_user_messages ')) {
       const userId = message.split(' ')[1].replace('@', '');
       const query = `
           SELECT *
