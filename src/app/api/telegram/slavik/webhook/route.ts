@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
             chat_id: chatId,
             text,
             disable_web_page_preview: true,
-            parse_mode: 'HTML',
+            parse_mode: 'Markdown',
           }),
         }
       )
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
             chat_id: chatId,
             text,
             disable_web_page_preview: true,
-            parse_mode: 'HTML',
+            parse_mode: 'Markdown',
           }),
         }
       )
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
             chat_id: chatId,
             text,
             disable_web_page_preview: true,
-            parse_mode: 'HTML',
+            parse_mode: 'Markdown',
           }),
         }
       )
