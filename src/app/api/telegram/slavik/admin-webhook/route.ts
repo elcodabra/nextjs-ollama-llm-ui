@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       const result = await pool.query(query, [userId]);
       const text = '<b>Count: ' + result.rows.length + '</b>%0A' + result.rows.map((row: any) => `${row.userrole}: ${row.message}`).join('%0A');
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
-    } else if (replyToMsg?.reply_markup?.inline_keyboard?.[0]?.callback_data && message) {
+    } else if (replyToMsg?.reply_markup?.inline_keyboard?.[0]?.[0]?.callback_data && message) {
       console.log('REPLY MANUAL')
       const { chatId , userName } = JSON.parse(replyToMsg?.reply_markup?.inline_keyboard?.[0]?.callback_data);
       const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=HTML`;
