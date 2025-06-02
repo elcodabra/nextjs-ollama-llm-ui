@@ -29,13 +29,106 @@ export async function POST(req: NextRequest) {
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     if (message === '/start') {
-      let text = 'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
+      let text; // = 'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
       if (languageCode === 'es') {
         text = '¡Bienvenido, <b>' + firstName + '</b>! Soy <b>Slavik</b>. Este es mi canal oficial.'
       } else if (languageCode === 'ru') {
         text = 'Привет, <b>' + firstName + '</b>. Меня зовут <b>Славик</b>.%0AНе стесняйся задавай свои вопросы%0A'
       }
-      await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
+      await fetch(TELEGRAM_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            disable_web_page_preview: true,
+            parse_mode: 'HTML',
+            reply_markup: {
+              keyboard: [
+                ['/about_me', '/question', '/my_business'],
+              ],
+              resize_keyboard: true,
+              one_time_keyboard: false
+            }
+          }),
+        }
+      )
+    } else if (message === '/about_me') {
+      const text = '' +
+        '<b>Soy Slavik Tsaryov, emprendedor residente en Valencia.</b>%0A' +
+        '%0A' +
+        'Durante años desarrollé uno de los primeros negocios de shisha en Europa. Abrí 11 tiendas en toda España, lounges exclusivos y construí en Ucrania la mayor fábrica de cazoletas para cachimbas de Europa. Creé sabores propios de tabaco y levanté una marca desde cero.%0A' +
+        '%0A' +
+        'Pero lo perdí todo por la guerra. A los 30 años, tuve que empezar desde cero.%0A' +
+        '%0A' +
+        'Hoy tengo dos lounges, dos restaurantes y una distribuidora de tabaco en España.%0A' +
+        '%0A' +
+        'Comparto mi experiencia para inspirar a otros a avanzar y no rendirse.%0A' +
+        '%0A' +
+        'Me gusta hablar claro, sin filtros.%0A';
+      await fetch(TELEGRAM_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            disable_web_page_preview: true,
+            parse_mode: 'HTML',
+          }),
+        }
+      )
+    } else if (message === '/question') {
+      const text = '' +
+        '¿Tienes una duda importante, una situación complicada o simplemente quieres mi opinión?%0A' +
+        '%0A' +
+        'Puedes escribirme directamente aquí. Leo todo personalmente.%0A' +
+        '%0A' +
+        'Este canal es para hablar de verdad, sin filtros.%0A' +
+        '%0A' +
+        'Pregunta lo que quieras — estoy aquí.';
+      await fetch(TELEGRAM_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            disable_web_page_preview: true,
+            parse_mode: 'HTML',
+          }),
+        }
+      )
+    } else if (message === '/my_business') {
+      const text = '' +
+        'Estos son algunos de mis proyectos actuales en España:%0A' +
+        '%0A' +
+        '• [Legend Selection](https://www.instagram.com/legendselection_valencia?igsh=MXJqZjVvZTQzdWV6cQ%3D%3D) — restaurante & lounge con cocina fusión, shisha y música.%0A' +
+        '%0A' +
+        '• [Legend Lounge](https://www.instagram.com/legendclub_valencia?igsh=MWdvb2ZiMTU5cmh4bA%3D%3D) — lounge de shisha premium.%0A' +
+        '%0A' +
+        '• [Batumi](https://www.instagram.com/batumienvalencia?igsh=ejdsZWxxaHAzeTA5) — restaurante de cocina georgiana.%0A' +
+        '%0A' +
+        '• [Slib Group](https://www.instagram.com/slib_group?igsh=cnlvYzE1eXpqcnB3) — distribuidora de tabaco en España.%0A' +
+        '%0A' +
+        'Siempre estoy desarrollando nuevas ideas.';
+      await fetch(TELEGRAM_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text,
+            disable_web_page_preview: true,
+            parse_mode: 'HTML',
+          }),
+        }
+      )
     } else {
       // TODO: role = 'user'
       const querySelect = `
