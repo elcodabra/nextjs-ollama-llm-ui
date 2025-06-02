@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_TELEGRAM_BOT_TOKEN;
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
+    console.log('message = ', message)
+
     if (message === '/start') {
       let text; // = 'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
       if (languageCode === 'es') {
