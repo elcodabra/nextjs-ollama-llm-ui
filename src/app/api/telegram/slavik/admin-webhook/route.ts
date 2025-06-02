@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     console.log('Incoming Telegram update for Admin:', JSON.stringify(body, null, 2));
 
     const message = body.message?.text;
+    const replyToMsg = body.message?.reply_to_message;
     const chatId = body.message?.chat?.id;
     const callbackQuery = body.callback_query ? JSON.parse(body.callback_query.data) : null;
 
@@ -41,6 +42,21 @@ export async function POST(req: NextRequest) {
       const result = await pool.query(query, [userId]);
       const text = '<b>Count: ' + result.rows.length + '</b>%0A' + result.rows.map((row: any) => `${row.userrole}: ${row.message}`).join('%0A');
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
+    } else if (replyToMsg?.reply_markup?.inline_keyboard?.[0]?.callback_data && message) {
+      console.log('REPLY MANUAL')
+      const { chatId , userName } = JSON.parse(replyToMsg?.reply_markup?.inline_keyboard?.[0]?.callback_data);
+      const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${chatId}&text=${message}&parse_mode=HTML`;
+      console.log('ANSWER_TELEGRAM_URL = ', ANSWER_TELEGRAM_URL);
+      await fetch(ANSWER_TELEGRAM_URL);
+
+      const query = `
+        INSERT INTO messages (userId, userRole, chatId, message)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *;
+      `;
+      const result = await pool.query(query, [userName || null, 'assistant', chatId, message]);
+      console.log('db result = ', result);
+
     } else if (callbackQuery?.chatId) {
       const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${body.callback_query.message.text}&parse_mode=HTML`;
       console.log('ANSWER_TELEGRAM_URL = ', ANSWER_TELEGRAM_URL);
