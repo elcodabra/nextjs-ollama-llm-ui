@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
 
     if (message === '/start') {
       let text = 'Hi, <b>' + firstName + '</b>. I\'m <b>Slavik</b>.%0APlease, ask your questions%0A'
-      if (languageCode === 'ru') {
+      if (languageCode === 'es') {
+        text = '¡Bienvenido, <b>' + firstName + '</b>! Soy <b>Slavik</b>. Este es mi canal oficial.'
+      } else if (languageCode === 'ru') {
         text = 'Привет, <b>' + firstName + '</b>. Меня зовут <b>Славик</b>.%0AНе стесняйся задавай свои вопросы%0A'
       }
       await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${text}&parse_mode=HTML`)
