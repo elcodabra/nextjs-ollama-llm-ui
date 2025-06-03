@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
           inline_keyboard: [
             [
               {
-                "text": "OK",
+                "text": "👍",
                 // Limit = 64 bytes
                 "callback_data": JSON.stringify({chatId, userName}),
               },
