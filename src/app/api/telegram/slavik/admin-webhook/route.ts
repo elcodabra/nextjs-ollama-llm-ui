@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           chat_id: ADMIN_CHAT_ID,
           message_id: replyToMsg.message_id,
-          text: `[👍DONE] ${replyToMsg.text}`,
+          text: `[👍DONE] ${message}`,
           reply_markup: replyToMsg.reply_markup,
           disable_web_page_preview: true,
           parse_mode: 'HTML',
