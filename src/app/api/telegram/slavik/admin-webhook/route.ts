@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
           chat_id: ADMIN_CHAT_ID,
           message_id: replyToMsg.message_id,
           text: `[👍DONE] ${message}`,
-          reply_markup: replyToMsg.reply_markup,
+          // reply_markup: replyToMsg.reply_markup, TODO: if needs more reply
           disable_web_page_preview: true,
           parse_mode: 'HTML',
         })
