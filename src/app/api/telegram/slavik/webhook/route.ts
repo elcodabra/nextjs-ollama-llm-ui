@@ -10,11 +10,11 @@ export async function POST(req: NextRequest) {
 
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
-    const firstName = body.message?.from.first_name
-    const lastName = body.message?.from.last_name
-    const userName = body.message?.from.username
-    const languageCode = body.message?.from.language_code
-    const isPremium = body.message?.from.is_premium
+    const firstName = body.message?.from.first_name;
+    const lastName = body.message?.from.last_name;
+    const userName = body.message?.from.username || body.message?.from.id;
+    const languageCode = body.message?.from.language_code;
+    const isPremium = body.message?.from.is_premium;
     // TODO: is_bot
 
     if (!message || !chatId) {
