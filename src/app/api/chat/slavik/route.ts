@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
   console.log('messages = ', messages);
 
-  const recentMessages = initialMessages.filter(({ role }: Message) => role !== 'system').slice(0, -5);
+  const recentMessages = initialMessages.filter(({ role, content }: Message) => role !== 'system' && !content.startsWith('/') ).slice(0, -5);
   let sumMessages;
   console.log('Recent messages length:', recentMessages.length);
   if (recentMessages.length >= 5) {
