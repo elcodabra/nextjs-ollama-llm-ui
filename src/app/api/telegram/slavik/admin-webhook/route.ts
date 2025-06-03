@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_ADMIN_TELEGRAM_BOT_TOKEN;
+    const ADMIN_CHAT_ID = process.env.SLAVIK_ADMIN_TELEGRAM_CHAT_ID;
     const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     if (message === '/start') {
@@ -60,15 +61,19 @@ export async function POST(req: NextRequest) {
       console.log('db result = ', result);
 
       console.log('replyToMsg.messageId = ', replyToMsg.message_id);
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
+      const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: chatId,
+          chat_id: ADMIN_CHAT_ID,
           message_id: replyToMsg.message_id,
           text: `[👍DONE] ${replyToMsg.text}`,
+          reply_markup: replyToMsg.reply_markup,
+          disable_web_page_preview: true,
+          parse_mode: 'HTML',
         })
-      })
+      }).then(res => res.json());
+      console.log('upd msg result = ', res)
 
     } else if (callbackQuery?.chatId) {
       const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${body.callback_query.message.text}&parse_mode=HTML`;
@@ -87,18 +92,21 @@ export async function POST(req: NextRequest) {
       const messageId = body.callback_query.message.message_id;
       const text = body.callback_query.message.text;
       console.log('messageId = ', messageId, text);
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
+      const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chat_id: chatId,
+          chat_id: ADMIN_CHAT_ID,
           message_id: messageId,
-          text: `[👍DONE] ${text}`,
+          text: `[👍 DONE] ${text}`,
           reply_markup: {
             inline_keyboard: []
-          }
+          },
+          disable_web_page_preview: true,
+          parse_mode: 'HTML',
         })
-      })
+      }).then(res => res.json());
+      console.log('upd msg result = ', res);
     }
     return NextResponse.json({ status: 'ok' });
   } catch (error) {

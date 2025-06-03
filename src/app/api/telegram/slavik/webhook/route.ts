@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
 
     const message = body.message?.text;
     const chatId = body.message?.chat?.id;
-    const firstName = body.message?.from.first_name;
-    const lastName = body.message?.from.last_name;
+    const firstName = body.message?.from.first_name || '';
+    const lastName = body.message?.from.last_name || '';
     const userName = body.message?.from.username || body.message?.from.id;
     const languageCode = body.message?.from.language_code;
     const isPremium = body.message?.from.is_premium;
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ret = await notify({
-      message: `Message from @${userName} (${isPremium ? '⭐' : ''}${firstName} ${lastName}): ${message}`,
+      message: `Message from @${userName} (${isPremium ? '⭐' : ''}${[firstName, lastName].join(' ')}): ${message}`,
     });
 
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_TELEGRAM_BOT_TOKEN;
