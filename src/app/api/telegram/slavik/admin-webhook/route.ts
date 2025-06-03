@@ -8,7 +8,6 @@ export async function POST(req: NextRequest) {
     console.log('Incoming Telegram update for Admin:', JSON.stringify(body, null, 2));
 
     const message = body.message?.text;
-    const messageId = body.message?.message_id;
     const replyToMsg = body.message?.reply_to_message;
     const chatId = body.message?.chat?.id;
     const callbackQuery = body.callback_query ? JSON.parse(body.callback_query.data) : null;
@@ -60,13 +59,13 @@ export async function POST(req: NextRequest) {
       const result = await pool.query(query, [userName || null, 'assistant', chatId, message]);
       console.log('db result = ', result);
 
-      console.log('replyToMsg.messageId = ', replyToMsg.messageId);
+      console.log('replyToMsg.messageId = ', replyToMsg.message_id);
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
-          message_id: replyToMsg.messageId,
+          message_id: replyToMsg.message_id,
           text: `[👍DONE] ${replyToMsg.text}`,
         })
       })
@@ -85,14 +84,16 @@ export async function POST(req: NextRequest) {
       const result = await pool.query(query, [callbackQuery.userName || null, 'assistant', callbackQuery.chatId, body.callback_query.message.text]);
       console.log('db result = ', result);
 
-      console.log('messageId = ', messageId);
+      const messageId = body.callback_query.message.message_id;
+      const text = body.callback_query.message.text;
+      console.log('messageId = ', messageId, text);
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: chatId,
           message_id: messageId,
-          text: `[👍DONE] ${message}`,
+          text: `[👍DONE] ${text}`,
           reply_markup: {
             inline_keyboard: []
           }
