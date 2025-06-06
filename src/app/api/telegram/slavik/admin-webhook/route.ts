@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import getAnswer from "@/lib/get-answer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,7 +77,23 @@ export async function POST(req: NextRequest) {
       console.log('upd msg result = ', res)
 
     } else if (callbackQuery?.chatId) {
-      const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${body.callback_query.message.text}&parse_mode=HTML`;
+
+      const buttonType = body.callback_query.message.reply_markup?.inline_keyboard?.[0]?.[0]?.text;
+      const text = body.callback_query.message.text;
+
+      console.log('buttonType = ', buttonType);
+
+      if (buttonType === '🔄') {
+        await getAnswer({
+          chatId: callbackQuery.chatId,
+          userName: callbackQuery.userName,
+          message: text,
+          replyTo: body.callback_query.message.message_id,
+        });
+        return NextResponse.json({ status: 'ok' });
+      }
+
+      const ANSWER_TELEGRAM_URL = `https://api.telegram.org/bot${process.env.SLAVIK_TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${callbackQuery?.chatId}&text=${text}&parse_mode=HTML`;
       console.log('ANSWER_TELEGRAM_URL = ', ANSWER_TELEGRAM_URL);
       await fetch(ANSWER_TELEGRAM_URL);
 
@@ -86,11 +103,10 @@ export async function POST(req: NextRequest) {
         VALUES ($1, $2, $3, $4)
         RETURNING *;
       `;
-      const result = await pool.query(query, [callbackQuery.userName || null, 'assistant', callbackQuery.chatId, body.callback_query.message.text]);
+      const result = await pool.query(query, [callbackQuery.userName || null, 'assistant', callbackQuery.chatId, text]);
       console.log('db result = ', result);
 
       const messageId = body.callback_query.message.message_id;
-      const text = body.callback_query.message.text;
       console.log('messageId = ', messageId, text);
       const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/editMessageText`, {
         method: 'POST',

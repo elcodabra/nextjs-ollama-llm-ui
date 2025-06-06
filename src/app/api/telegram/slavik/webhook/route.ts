@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {notify} from '@/lib/notify';
-import pool from '@/lib/db';
+import getAnswer from "@/lib/get-answer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -145,67 +145,13 @@ export async function POST(req: NextRequest) {
         }
       )
     } else {
-      // TODO: role = 'user'
-      const querySelect = `
-          SELECT *
-          FROM public.messages
-          WHERE chatid = $1
-            AND userrole = 'user'
-          ORDER BY createdat ASC;
-      `;
-
-      const resultSelect = await pool.query(querySelect, [chatId]);
-      console.log('resultSelect.rows = ', JSON.stringify(resultSelect.rows, null, 2));
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HOST || 'http://localhost:3000'}/api/chat/slavik`, {
-        method: 'POST',
-        body: JSON.stringify({
-          // TODO: history
-          messages: [...resultSelect.rows.map(({message}: any) => ({
-            role: 'user', content: message, /* {
-              type: "text",
-              text: message,
-            } */
-          })) || [], {
-            role: 'user',
-            content: message,
-          }],
-        }),
-      }).then(res => res.json());
-      await notify({
-        message: response?.text || 'error',
+      await getAnswer({
+        chatId,
+        userName,
+        message,
         replyTo: ret?.data?.result?.message_id,
-        replyMarkup: {
-          inline_keyboard: [
-            [
-              {
-                "text": "👍",
-                // Limit = 64 bytes
-                "callback_data": JSON.stringify({chatId, userName}),
-              },
-              /*
-              {
-                "text": "Retry",
-                "callback_data": "",
-              },
-              {
-                "text": "Ask to pay",
-                "callback_data": "",
-              }
-              */
-            ]
-          ]
-        }
-      })
-      const query = `
-          INSERT INTO messages (userId, userRole, chatId, message)
-          VALUES ($1, $2, $3, $4) RETURNING *;
-      `;
-      const result = await pool.query(query, [userName ?? null, 'user', chatId, message]);
-      console.log('db result = ', result);
-      // await fetch(`${TELEGRAM_API_URL}?chat_id=${chatId}&text=${response?.text || 'error'}&parse_mode=HTML`)
+      });
     }
-
     return NextResponse.json({status: 'ok'});
   } catch (error) {
     console.error('Telegram webhook error:', error);
