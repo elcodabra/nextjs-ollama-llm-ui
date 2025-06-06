@@ -22,7 +22,18 @@ export async function POST(req: NextRequest) {
     }
 
     const ret = await notify({
-      message: `Message from @${userName} (${isPremium ? '⭐' : ''}${[firstName, lastName].join(' ')}): ${message}`,
+      message: `Message from @${userName} (${isPremium ? '⭐' : ''}${[firstName, lastName].filter(n => !!n).join(' ')}): ${message}`,
+      replyMarkup: {
+        inline_keyboard: [
+          [
+            {
+              "text": "🔄",
+              // Limit = 64 bytes
+              "callback_data": JSON.stringify({chatId, userName}),
+            },
+          ]
+        ]
+      }
     });
 
     const TELEGRAM_BOT_TOKEN = process.env.SLAVIK_TELEGRAM_BOT_TOKEN;
