@@ -1,7 +1,7 @@
 import { createOllama } from 'ollama-ai-provider';
 import { convertToCoreMessages, generateText, UserContent } from 'ai';
 import { NextResponse } from 'next/server';
-import { createBooking, getAvailableSlots, weatherTool } from '@/lib/tools';
+import {createBooking, getAvailableSlots, getCurrencyExchangeRates, weatherTool} from '@/lib/tools';
 import {parseInt} from "lodash";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +46,7 @@ export async function POST(req: Request) {
       // weather: weatherTool,
       available_slots: getAvailableSlots,
       create_booking: createBooking,
+      get_currency_exchange_rates: getCurrencyExchangeRates,
     },
     ...(process.env.TEMPERATURE ? { temperature: parseFloat(process.env.TEMPERATURE) } : {}),
     ...(process.env.MAX_TOKENS ? { maxTokens: parseInt(process.env.MAX_TOKENS) } : {}),

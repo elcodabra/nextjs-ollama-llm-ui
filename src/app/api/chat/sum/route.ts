@@ -1,8 +1,7 @@
 import { createOllama } from 'ollama-ai-provider';
 import { convertToCoreMessages, generateText, UserContent } from 'ai';
 import { NextResponse } from 'next/server';
-import { createBooking, getAvailableSlots, weatherTool } from '@/lib/tools';
-import {parseInt} from "lodash";
+// import { createBooking, getAvailableSlots, weatherTool } from '@/lib/tools';
 import {Message} from "ai/react";
 
 export const dynamic = "force-dynamic";

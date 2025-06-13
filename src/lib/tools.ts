@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { tool } from 'ai';
+import * as chrono from 'chrono-node';
 
 export function getWeather(location: string): string {
   return `Погода в ${location} — солнечно, 22°C.`;
@@ -122,3 +123,52 @@ export const getRetrieverTool = (name: string) => tool({
     return { query, text: result.data.generated, role: 'tool' };
   },
 });
+
+export enum CURRENCIES {
+  RUB = 'RUB',
+  USD = 'USD',
+  GBP = 'GBP',
+}
+
+function formatDateToYYYYMMDD(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы с 0
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export const getCurrencyExchangeRates = tool({
+  description: 'Get currency exchange rates relative to EUR by the date',
+  parameters: z.object({
+    date: z.string().describe('The date to get the exchange rate'),
+    currency: z.nativeEnum(CURRENCIES).describe('The currency to convert to EUR (e.g., USD → EUR rate)R')
+  }),
+  execute: async ({ date, currency }) => {
+    console.log('getCurrencyExchangeRates = ', currency, date);
+
+    const parsedDate = chrono.parseDate(date);
+    if (!parsedDate) {
+      throw new Error(`Invalid date format: "${date}"`);
+    }
+
+    const formatedDate = formatDateToYYYYMMDD(parsedDate);
+    console.log('getCurrencyExchangeRates formatedDate = ', formatedDate)
+
+    const result = await fetch(`https://app.bde.es/bierest/resources/srdatosapp/listaSeries?idioma=en&series=DTCCBCERUBEUR.B,CT.CED.USD.Z.APP,CT.CED.GBP.Z.APP&rango=3M`, {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .catch(err => console.error(err));
+
+    // console.log('getCurrencyExchangeRates result = ', result)
+    const idx = result?.find(({ simbolo }: any) => simbolo === currency)?.fechas?.find((fecha: string) => fecha.startsWith(formatedDate));
+    console.log('getCurrencyExchangeRates idx = ', idx)
+    const value = result?.find(({ simbolo }: any) => simbolo === currency)?.valores?.[idx || 0];
+    return {
+      date: formatedDate,
+      currency,
+      baseCurrency: 'EUR',
+      value,
+    };
+  },
+})
