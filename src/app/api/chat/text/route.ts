@@ -12,6 +12,9 @@ export const revalidate = 0;
 export async function POST(req: Request) {
   const { messages, selectedModel, data } = await req.json();
 
+  const [model, server] = selectedModel.split(' ')
+  console.log('model = ', model);
+
   const OLLAMA_URL = process.env.OLLAMA_URL;
   console.log('OLLAMA_URL:', process.env.OLLAMA_URL);
 
@@ -23,24 +26,29 @@ export async function POST(req: Request) {
   // Build message content array directly
   const messageContent: UserContent = [{ type: 'text', text: currentMessage.content }];
 
+  // console.log('data?.images = ', data?.images);
   // Add images if they exist
   data?.images?.forEach((imageUrl: string) => {
     const image = new URL(imageUrl);
     messageContent.push({ type: 'image', image });
   });
 
+  // console.log('messageContent = ', messageContent);
+
   const messagesList = [
-    ...(process.env.SYSTEM_PROMPT ? [{ role: 'system', content: process.env.SYSTEM_PROMPT }] : []),
-    ...(process.env.USER_PROMPT ? [{ role: 'system', content: process.env.USER_PROMPT }] : []),
+    // ...(process.env.SYSTEM_PROMPT ? [{ role: 'system', content: process.env.SYSTEM_PROMPT }] : []),
+    // ...(process.env.USER_PROMPT ? [{ role: 'system', content: process.env.USER_PROMPT }] : []),
     // { role: 'system', content: 'You are a chat companion who talks like a close friend. Keep it casual, warm, and real — no assistant behavior, no help offers, no robotic phrasing. Keep replies short and natural, like a quick text or voice message in a chat. Be present, curious, and a little playful when it fits. You’re here to hang out, not solve things.' },
     // { role: 'system', content: 'Ты дружелюбный чат-бот, который общается как хороший друг. Говори по-простому, тепло, без официальности. Не предлагай помощь, не веди себя как ассистент. Отвечай коротко, естественно — как будто переписываешься в чате. Можно с ноткой юмора или лёгкой иронии, если подходит.' },
-    ...convertToCoreMessages(initialMessages),
+    // ...convertToCoreMessages(initialMessages),
     // ...initialMessages,
     { role: 'user', content: messageContent },
   ]
 
+  console.log('messagesList = ', messagesList);
+
   const result = await generateText({
-    model: ollama(selectedModel || 'llama3.1:latest'),
+    model: ollama(model || 'llama3.1:latest'),
     // model: ollama('yandex/YandexGPT-5-Lite-8B-instruct-GGUF:latest'),
     tools: {
       // weather: weatherTool,
